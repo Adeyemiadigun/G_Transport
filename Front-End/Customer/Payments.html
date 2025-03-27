@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payments</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white h-screen p-5 shadow-lg">
+        <h2 class="text-xl font-bold mb-5">Dashboard</h2>
+        <nav>
+            <ul class="space-y-3">
+                <li><a href="home.html" class="block bg-gray-200 p-2 rounded">Home</a></li>
+                <li><a href="/Customer/Mytrips.html" class="block p-2 hover:bg-gray-200 rounded">My Trips</a></li>
+                <li><a href="/Customer/payments.html" class="block p-2 hover:bg-gray-200 rounded">Payments</a></li>
+                <li><a href="/Customer/reviews.html" class="block p-2 hover:bg-gray-200 rounded">Reviews</a></li>
+                <li><a href="settings.html" class="block p-2 hover:bg-gray-200 rounded">Settings</a></li>
+                <li><a href="logout.html" class="block text-red-500 p-2 hover:bg-red-100 rounded">Logout</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+        <h1 class="text-2xl font-bold">My Payments</h1>
+
+        <div class="bg-white p-6 shadow rounded-lg mt-6">
+            <h2 class="text-xl font-bold mb-4">Payment History</h2>
+            <table class="w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-2">Reference No</th>
+                        <th class="border p-2">Transaction</th>
+                        <th class="border p-2">Amount</th>
+                        <th class="border p-2">Status</th>
+                        <th class="border p-2">Date</th>
+                        <th class="border p-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    <!-- Data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+   
+    </script>
+</body>
+</html>

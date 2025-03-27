@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">G-Transport</h1>
+            <ul class="hidden md:flex space-x-6">
+                <li><a href="/features.html" class="text-gray-600 hover:text-gray-900">Features</a></li>
+                <li><a href="/HowItWorks.html" class="text-gray-600 hover:text-gray-900">How It Works</a></li>
+                <li><a href="/Testimonial.html" class="text-gray-600 hover:text-gray-900">Testimonials</a></li>
+                <li><a href="#contact" class="text-gray-600 hover:text-gray-900">Contact</a></li>
+            </ul>
+            <div class="flex gap-2">  
+            <a href="/Auth/Auth.html" class="text-blue-600 px-4 py-2 rounded-md border border-blue-600">Login</a>
+            <a href="/Auth/Auth.html" class="bg-blue-600 text-white px-4 py-2 rounded-md">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="h-screen flex flex-col justify-center items-center text-center bg-blue-600 text-white px-6 bg-cover bg-center bg-[url('/Assets/Img/2148921691.jpg')]">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/90 to-transparent"></div>
+        <h1 class="text-5xl font-bold drop-shadow-lg">Welcome to Our Service </h1>
+        <p class="mt-4 text-lg drop-shadow-lg">Experience the best service with just a few clicks.</p>
+        <a href="#features" class="mt-6 bg-white text-blue-600 px-6 py-3 rounded-md drop-shadow-lg animate-bounce">Learn More</a>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="container mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-8">Our Features</h2>
+            <div class="grid md:grid-cols-3 gap-8 ">
+                <div class="p-6 shadow-md rounded-md bg-gray-50 flex flex-col gap-2 items-center justify-center transition duration-300 hover:scale-105">
+                    <img src="/Assets/Icons/star.png" alt="">
+                    <h3 class="text-xl font-semibold">Seamless Booking Experience</h3>
+                    <p class="text-gray-600 mt-2">All our vehicles are well-maintained and driven by professional, verified drivers to ensure your safety.</p>
+                </div>
+                <div class="p-6 shadow-md rounded-md bg-gray-50  flex flex-col gap-2 items-center justify-center  transition duration-300 hover:scale-105">
+                    <img src="/Assets/Icons/price-tags.png" alt="">
+                    <h3 class="text-xl font-semibold">Affordable Pricing</h3>
+                    <p class="text-gray-600 mt-2">We offer competitive pricing with no hidden charges, giving you the best value for your money.</p>
+                </div>
+                <div class="p-6 shadow-md rounded-md bg-gray-50  flex flex-col gap-2 items-center justify-center  transition duration-300 hover:scale-105">
+                    <img src="/Assets/Icons/time-to-study.png" alt="">
+
+                    <h3 class="text-xl font-semibold"> Flexible Scheduling</h3>
+                    <p class="text-gray-600 mt-2">Plan your trips in advance with our easy scheduling options tailored to your convenience.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="bg-gray-100 py-16">
+    <div class="max-w-5xl mx-auto text-center">
+        <h2 class="text-3xl font-bold text-gray-900">How It Works</h2>
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <!-- Step 1 -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center transition duration-300 hover:scale-105 gap-2">
+                <div class="text-5xl text-blue-500 font-bold">1</div>
+                <img src="/Assets/Icons/search_4398568.png" alt="Search" class="w-12 h-12 my-3">
+                <p class="text-lg font-semibold text-gray-700">Search</p>
+                <p class="text-gray-500 text-sm text-center">Find the best trips tailored for you.</p>
+            </div>
+            <!-- Step 2 -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center transition duration-300 hover:scale-105 gap-2">
+                <div class="text-5xl text-blue-500 font-bold">2</div>
+                <img src="/Assets/Icons/arrow_15631507.png" alt="Select" class="w-12 h-12 my-3">
+                <p class="text-lg font-semibold text-gray-700">Select</p>
+                <p class="text-gray-500 text-sm text-center">Choose your preferred ride easily.</p>
+            </div>
+            <!-- Step 3 -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center transition duration-300 hover:scale-105 gap-2">
+                <div class="text-5xl text-blue-500 font-bold">3</div>
+                <img src="/Assets/Icons/booking_8133002.png" alt="Book" class="w-12 h-12 my-3">
+                <p class="text-lg font-semibold text-gray-700">Book</p>
+                <p class="text-gray-500 text-sm text-center">Confirm your booking in one click.</p>
+            </div>
+            <!-- Step 4 -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center transition duration-300 hover:scale-105 gap-2">
+                <div class="text-5xl text-blue-500 font-bold">4</div>
+                <img src="/Assets/Icons/cheerful_17366621.png" alt="Enjoy" class="w-12 h-12 my-3">
+                <p class="text-lg font-semibold text-gray-700">Enjoy</p>
+                <p class="text-gray-500 text-sm text-center">Sit back and enjoy the ride!</p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="testimonials" class="py-20 bg-gray-100">
+    <div class="container mx-auto text-center">
+        <h2 class="text-3xl font-bold mb-10 text-gray-800">What Our Customers Say</h2>
+        <div class="grid md:grid-cols-3 gap-8 px-6">
+            <!-- Testimonial 1 -->
+            <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center text-center transition duration-300 hover:scale-105">
+                <img src="/Assets/Icons/star.png" alt="Five-star rating" class="w-12 h-12">
+                <h3 class="text-xl font-semibold mt-4">Exceptional Service & Comfort</h3>
+                <p class="text-gray-600 mt-3">"I had an amazing experience! The booking process was smooth, the car was spotless, and the driver was extremely professional. Highly recommended!"</p>
+                <span class="text-gray-500 text-sm mt-3 font-medium">— Sarah M., Frequent Traveler</span>
+            </div>
+            <!-- Testimonial 2 -->
+            <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center text-center transition duration-300 hover:scale-105">
+                <img src="/Assets/Icons/star.png" alt="Five-star rating" class="w-12 h-12">
+                <h3 class="text-xl font-semibold mt-4">Reliable & On-Time</h3>
+                <p class="text-gray-600 mt-3">"The driver arrived on time, the vehicle was in excellent condition, and the entire ride was hassle-free. Will definitely use again!"</p>
+                <span class="text-gray-500 text-sm mt-3 font-medium">— James K., Business Traveler</span>
+            </div>
+            <!-- Testimonial 3 -->
+            <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center text-center transition duration-300 hover:scale-105">
+                <img src="/Assets/Icons/star.png" alt="Five-star rating" class="w-12 h-12">
+                <h3 class="text-xl font-semibold mt-4">Stress-Free Travel</h3>
+                <p class="text-gray-600 mt-3">"From booking to drop-off, everything was seamless. The ride was smooth, and the customer support was responsive. Highly enjoyable!"</p>
+                <span class="text-gray-500 text-sm mt-3 font-medium">— Emily R., Solo Traveler</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Call To Action -->
+    <section class="relative py-20 bg-blue-600 text-white text-center bg-cover bg-center bg-[url('/Assets/Img/13543.jpg')] h-screen flex justify-center items-center flex-col gap-6">
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-transparent"></div>
+
+    <!-- Content (Ensure it's above overlay) -->
+    <h2 class="text-4xl font-bold drop-shadow-lg z-10">Ready to Get Started?</h2>
+    <a href="#" class="mt-6 bg-black text-white px-6 py-3 rounded-md drop-shadow-lg z-10">Sign Up Now</a>
+</section>
+
+
+    <!-- Footer -->
+    <footer class="py-6 bg-gray-900 text-white text-center">
+        <p>&copy; 2025 Brand. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - G-Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md fixed w-full z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">G-Transport</h1>
+            <ul class="hidden md:flex space-x-6">
+                <li><a href="landingPage.html" class="text-gray-600 hover:text-gray-900">Home</a></li>
+                <li><a href="features.html" class="text-gray-600 hover:text-gray-900">Features</a></li>
+                <li><a href="#" class="text-blue-600 font-semibold">How It Works</a></li>
+                <li><a href="Testimonial.html" class="text-gray-600 hover:text-gray-900">Testimonials</a></li>
+                <li><a href="contact.html" class="text-gray-600 hover:text-gray-900">Contact</a></li>
+            </ul>
+            <div class="flex gap-2">  
+                <a href="/Auth/Auth.html" class="text-blue-600 px-4 py-2 rounded-md border border-blue-600">Login</a>
+                <a href="/Auth/Auth.html" class="bg-blue-600 text-white px-4 py-2 rounded-md">Book a Ride</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-[60vh] flex flex-col justify-center items-center text-center text-white px-6 bg-cover bg-center" style="background-image: url('/Assets/Img/how-it-works-bg.jpg');">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative z-10">
+            <h1 class="text-5xl font-bold">How It Works</h1>
+            <p class="mt-4 text-lg max-w-2xl">Book your ride in just a few simple steps and travel hassle-free with G-Transport.</p>
+        </div>
+    </section>
+
+    <!-- How It Works Steps -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-10 text-gray-800">Follow These Simple Steps</h2>
+            <div class="grid md:grid-cols-3 gap-12 px-6">
+                <!-- Step 1 -->
+                <div class="bg-gray-100 p-8 rounded-lg shadow-md flex flex-col items-center">
+                    <img src="/Assets/Icons/signup.png" alt="Sign Up" class="w-16 h-16">
+                    <h3 class="text-xl font-semibold mt-4">Step 1: Sign Up</h3>
+                    <p class="text-gray-600 mt-3">Create a free account to start booking rides instantly.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="bg-gray-100 p-8 rounded-lg shadow-md flex flex-col items-center">
+                    <img src="/Assets/Icons/search.png" alt="Find a Ride" class="w-16 h-16">
+                    <h3 class="text-xl font-semibold mt-4">Step 2: Enter Your Destination</h3>
+                    <p class="text-gray-600 mt-3">Provide your pickup and drop-off locations to find a ride.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="bg-gray-100 p-8 rounded-lg shadow-md flex flex-col items-center">
+                    <img src="/Assets/Icons/ride.png" alt="Enjoy Ride" class="w-16 h-16">
+                    <h3 class="text-xl font-semibold mt-4">Step 3: Book & Enjoy Your Ride</h3>
+                    <p class="text-gray-600 mt-3">Confirm your booking, meet your driver, and enjoy a smooth journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="relative py-20 bg-blue-600 text-white text-center">
+        <h2 class="text-4xl font-bold">Ready to Ride?</h2>
+        <p class="mt-4 text-lg">Sign up now and experience the convenience of G-Transport.</p>
+        <a href="/Auth/Auth.html" class="mt-6 bg-black text-white px-6 py-3 rounded-md inline-block">Get Started</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-6 bg-gray-900 text-white text-center">
+        <p>&copy; 2025 G-Transport. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

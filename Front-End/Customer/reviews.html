@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Reviews</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white p-6 shadow-md">
+            <h2 class="text-xl font-semibold mb-6">Dashboard</h2>
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Home</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">My Trips</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Book a Trip</a></li>
+                    <li><a href="#" class="block p-2 bg-gray-200 rounded">Reviews</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Settings</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-red-200 rounded text-red-500">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <h1 class="text-2xl font-bold mb-6">Pending Reviews</h1>
+            
+            <!-- Submit a Review -->
+            <div class="bg-white p-6 shadow rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">Write a Review</h2>
+                <form id="review-form">
+                    <label class="block mb-2">Select Trip:</label>
+                    <select id="trip-select" class="w-full p-2 border rounded mb-4">
+                        <!-- Trips will be populated dynamically -->
+                    </select>
+                    
+                    <label class="block mb-2">Rating:</label>
+                    <select id="rating" class="w-full p-2 border rounded mb-4">
+                        <option value="1">⭐☆☆☆☆</option>
+                        <option value="2">⭐⭐☆☆☆</option>
+                        <option value="3">⭐⭐⭐☆☆</option>
+                        <option value="4">⭐⭐⭐⭐☆</option>
+                        <option value="5">⭐⭐⭐⭐⭐</option>
+                    </select>
+                    
+                    <label class="block mb-2">Comment:</label>
+                    <textarea id="comment" class="w-full p-2 border rounded mb-4" rows="3" placeholder="Write your review here..."></textarea>
+                    
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit Review</button>
+                </form>
+            </div>
+            <div class="bg-white p-6 shadow rounded-lg mt-6">
+            <h2 class="text-xl font-semibold mb-4">Previous Reviews</h2>
+            <div id="reviews-list" class="space-y-4">
+                
+            </div>
+            </div>
+
+        </main>
+    </div>
+    <script src="/script/ReviewPage.js"></script>
+</body>
+</html>

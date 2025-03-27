@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white p-6 shadow-md">
+            <h2 class="text-xl font-semibold mb-6">Driver Dashboard</h2>
+            <nav>
+                <ul class="space-y-4">
+                    <li><a href="#" class="block p-2 bg-gray-200 rounded">Home</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Assigned Trip</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Previous Trips</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Profile</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-red-200 rounded text-red-500">Logout</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <h1 class="text-2xl font-bold mb-6">Welcome, Driver</h1>
+
+            <!-- Assigned Trip -->
+            <div class="bg-white p-6 shadow rounded-lg mb-6">
+                <h2 class="text-xl font-semibold mb-4">Assigned Trip</h2>
+                <div class="bg-gray-100 p-4 rounded-lg shadow" id="assignedTrip">
+                    
+                </div>
+            </div>
+
+            <!-- Previous Trips -->
+            <div class="bg-white p-6 shadow rounded-lg">
+                <h2 class="text-xl font-semibold mb-4">Previous Trips</h2>
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="p-2">Trip</th>
+                            <th class="p-2">Date</th>
+                            <th class="p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="previousTrips">
+                        <tr class="border-b">
+                            <td class="p-2">Lagos to Ibadan</td>
+                            <td class="p-2">March 10, 2025</td>
+                            <td class="p-2 text-green-500">Completed</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-2">Abuja to Kano</td>
+                            <td class="p-2">March 15, 2025</td>
+                            <td class="p-2 text-green-500">Completed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="/script/DriverDash.js"></script>
+</body>
+</html>
