@@ -14,19 +14,24 @@ let customerTrip = async () => {
   let response = await Count(
     "https://localhost:7156/api/Trip/Customer-Trips-Count"
   );
-  document.querySelector("#tripCount").innerHTML = response.CustomerTrip;
+  document.querySelector("#tripCount").innerHTML = response.CustomerTrip || 0;
 };
-await customerTrip();
+
 
 let pendingReview = async () => {
   let response = await Count(
     "https://localhost:7156/api/Trip/Customer-Trips-pending-review"
   );
   document.querySelector("#pendingReview").innerHTML =
-    response.pendingReview;
+    response.pendingReview || 0;
 };
 let currentCustomer;
-pendingReview()
+
+(async () => 
+{
+  await customerTrip();
+  await pendingReview();
+})()
 let postEvent = async () => {
   try {
     let response = await fetch("https://localhost:7156/api/Customer/profile", {

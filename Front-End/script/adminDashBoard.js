@@ -56,19 +56,23 @@ let tripCount = async () =>
 {
   let response = await Count("https://localhost:7156/api/Trip/TripCount");
   document.querySelector("#tripCount").innerHTML =
-  response.successfullTripCount;
+  response.successfullTripCount || 0;
 }
-await tripCount()
 
 
 let displayFailedCount = async () => {
   let response = await Count("https://localhost:7156/api/Trip/FailedTripCount");
-  document.querySelector("#failedTrip").innerHTML = response.failedTripCount;
+  document.querySelector("#failedTrip").innerHTML = response.failedTripCount || 0;
 };
-await displayFailedCount();
 
 let customer = async () => {
   let response = await Count("https://localhost:7156/api/Trip/FailedTripCount");
-  document.querySelector("#customer").innerHTML = response.failedTripCount;
+  document.querySelector("#customer").innerHTML = response.failedTripCount || 0;
 };
-customer();
+
+
+(async () => {
+  await displayFailedCount();
+  await customer();
+  await tripCount();
+})()
