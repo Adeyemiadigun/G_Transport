@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G_Transport.Migrations
 {
     [DbContext(typeof(G_TransportContext))]
-    [Migration("20250225145555_FixDepartureTime")]
-    partial class FixDepartureTime
+    [Migration("20250403193902_initials")]
+    partial class initials
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -190,7 +190,6 @@ namespace G_Transport.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
@@ -270,24 +269,24 @@ namespace G_Transport.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f78da087-8308-4513-8d4a-780e631fae6c"),
-                            DateCreated = new DateTime(2025, 2, 25, 14, 55, 55, 69, DateTimeKind.Utc).AddTicks(9214),
+                            Id = new Guid("4736f221-f829-4584-9431-52bdf9c10048"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1274),
                             Description = "System administrator",
                             IsDeleted = false,
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("d06c9e0d-5d14-4e35-b266-462d6fc14192"),
-                            DateCreated = new DateTime(2025, 2, 25, 14, 55, 55, 69, DateTimeKind.Utc).AddTicks(9220),
+                            Id = new Guid("736eb72f-d382-468f-963f-c70729f5bd45"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1283),
                             Description = "Registered driver",
                             IsDeleted = false,
                             Name = "Driver"
                         },
                         new
                         {
-                            Id = new Guid("7521a4ee-e514-46cd-ad6d-a553023f7a61"),
-                            DateCreated = new DateTime(2025, 2, 25, 14, 55, 55, 69, DateTimeKind.Utc).AddTicks(9224),
+                            Id = new Guid("a1c51e6e-7306-42ec-87b2-8af3f379bf52"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1287),
                             Description = "Regular customer",
                             IsDeleted = false,
                             Name = "Customer"
@@ -304,6 +303,9 @@ namespace G_Transport.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DepartureDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<TimeSpan?>("DepartureTime")
@@ -335,6 +337,33 @@ namespace G_Transport.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("G_Transport.Models.Domain.TripDriver", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid>("TripId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DriverId");
+
+                    b.HasIndex("TripId");
+
+                    b.ToTable("TripDrivers");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.User", b =>
@@ -405,9 +434,6 @@ namespace G_Transport.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("char(36)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -421,36 +447,7 @@ namespace G_Transport.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DriverId")
-                        .IsUnique();
-
                     b.ToTable("Vehicles");
-                });
-
-            modelBuilder.Entity("G_Transport.Models.Domain.Wallet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("WalletBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId")
-                        .IsUnique();
-
-                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Booking", b =>
@@ -497,7 +494,7 @@ namespace G_Transport.Migrations
             modelBuilder.Entity("G_Transport.Models.Domain.Payment", b =>
                 {
                     b.HasOne("G_Transport.Models.Domain.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Payments")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -543,6 +540,25 @@ namespace G_Transport.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("G_Transport.Models.Domain.TripDriver", b =>
+                {
+                    b.HasOne("G_Transport.Models.Domain.Driver", "Driver")
+                        .WithMany("Trips")
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G_Transport.Models.Domain.Trip", "Trip")
+                        .WithMany("Drivers")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("Trip");
+                });
+
             modelBuilder.Entity("G_Transport.Models.Domain.UserRole", b =>
                 {
                     b.HasOne("G_Transport.Models.Domain.Role", "Role")
@@ -562,49 +578,25 @@ namespace G_Transport.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("G_Transport.Models.Domain.Vehicle", b =>
-                {
-                    b.HasOne("G_Transport.Models.Domain.Driver", "Driver")
-                        .WithOne("Vehicle")
-                        .HasForeignKey("G_Transport.Models.Domain.Vehicle", "DriverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Driver");
-                });
-
-            modelBuilder.Entity("G_Transport.Models.Domain.Wallet", b =>
-                {
-                    b.HasOne("G_Transport.Models.Domain.Customer", "Customer")
-                        .WithOne("Wallet")
-                        .HasForeignKey("G_Transport.Models.Domain.Wallet", "CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("G_Transport.Models.Domain.Customer", b =>
                 {
                     b.Navigation("Bookings");
 
-                    b.Navigation("Reviews");
+                    b.Navigation("Payments");
 
-                    b.Navigation("Wallet");
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Driver", b =>
                 {
-                    b.Navigation("Vehicle");
+                    b.Navigation("Trips");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Profile", b =>
                 {
-                    b.Navigation("Customer")
-                        .IsRequired();
+                    b.Navigation("Customer");
 
-                    b.Navigation("Driver")
-                        .IsRequired();
+                    b.Navigation("Driver");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Role", b =>
@@ -615,6 +607,8 @@ namespace G_Transport.Migrations
             modelBuilder.Entity("G_Transport.Models.Domain.Trip", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Drivers");
 
                     b.Navigation("Reviews");
                 });

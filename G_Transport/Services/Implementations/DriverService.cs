@@ -104,8 +104,8 @@ namespace G_Transport.Services.Implementations
             }
 
             driver.IsDeleted = true;
-            _driverRepository.Update(driver); // Use BaseRepository Update method
-            await _unitOfWork.SaveChangesAsync(); // Save changes
+            _driverRepository.Update(driver); 
+            await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
@@ -168,7 +168,7 @@ namespace G_Transport.Services.Implementations
         {
             var today = DateTime.UtcNow.Date;
             var availableDrivers = await _driverRepository.GetAllAsync(d =>
-                !d.Trips.Any(t => t.DepartureDate.Date == today));
+                !d.Trips.Any(td => td.Trip.DepartureDate.Date == today));
             if (availableDrivers.Count == 0|| availableDrivers is null)
             {
                 return new BaseResponse<ICollection<DriverDto?>>

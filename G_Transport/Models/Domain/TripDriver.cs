@@ -1,6 +1,6 @@
 ﻿namespace G_Transport.Models.Domain
 {
-    public class TripDriver
+    public class TripDriver :BaseEntity
     {
         public Guid DriverId { get; set; }
         public Driver Driver { get; set; } = default!;

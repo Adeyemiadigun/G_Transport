@@ -24,7 +24,7 @@ namespace G_Transport.Migrations
                     FirstName = table.Column<string>(type: "longtext", nullable: false),
                     LastName = table.Column<string>(type: "longtext", nullable: false),
                     MiddleName = table.Column<string>(type: "longtext", nullable: false),
-                    ImageUrl = table.Column<string>(type: "longtext", nullable: false),
+                    ImageUrl = table.Column<string>(type: "longtext", nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -64,6 +64,24 @@ namespace G_Transport.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    Capacity = table.Column<int>(type: "int", nullable: false),
+                    PlateNo = table.Column<string>(type: "longtext", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.Id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -145,53 +163,6 @@ namespace G_Transport.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Wallets",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    WalletBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Wallets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Wallets_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Vehicles",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false),
-                    Description = table.Column<string>(type: "longtext", nullable: false),
-                    Capacity = table.Column<int>(type: "int", nullable: false),
-                    PlateNo = table.Column<string>(type: "longtext", nullable: false),
-                    DriverId = table.Column<Guid>(type: "char(36)", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vehicles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Vehicles_Drivers_DriverId",
-                        column: x => x.DriverId,
-                        principalTable: "Drivers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Trips",
                 columns: table => new
                 {
@@ -202,6 +173,7 @@ namespace G_Transport.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     VehicleId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    DepartureDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DepartureTime = table.Column<TimeSpan>(type: "time(6)", nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -312,14 +284,42 @@ namespace G_Transport.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "TripDrivers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false),
+                    DriverId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    TripId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TripDrivers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TripDrivers_Drivers_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Drivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TripDrivers_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "DateCreated", "Description", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("58149679-9596-4bbf-8079-b40c7f81ce13"), new DateTime(2025, 2, 28, 8, 29, 19, 884, DateTimeKind.Utc).AddTicks(4263), "Registered driver", false, "Driver" },
-                    { new Guid("64017410-6a48-4fcc-952b-1f7c045fd517"), new DateTime(2025, 2, 28, 8, 29, 19, 884, DateTimeKind.Utc).AddTicks(4163), "System administrator", false, "Admin" },
-                    { new Guid("af15ec95-f19a-4cae-846d-896de8b26221"), new DateTime(2025, 2, 28, 8, 29, 19, 884, DateTimeKind.Utc).AddTicks(4267), "Regular customer", false, "Customer" }
+                    { new Guid("4736f221-f829-4584-9431-52bdf9c10048"), new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1274), "System administrator", false, "Admin" },
+                    { new Guid("736eb72f-d382-468f-963f-c70729f5bd45"), new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1283), "Registered driver", false, "Driver" },
+                    { new Guid("a1c51e6e-7306-42ec-87b2-8af3f379bf52"), new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1287), "Regular customer", false, "Customer" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -365,6 +365,16 @@ namespace G_Transport.Migrations
                 column: "TripId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TripDrivers_DriverId",
+                table: "TripDrivers",
+                column: "DriverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TripDrivers_TripId",
+                table: "TripDrivers",
+                column: "TripId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Trips_VehicleId",
                 table: "Trips",
                 column: "VehicleId");
@@ -378,18 +388,6 @@ namespace G_Transport.Migrations
                 name: "IX_UserRoles_UserId",
                 table: "UserRoles",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Vehicles_DriverId",
-                table: "Vehicles",
-                column: "DriverId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Wallets_CustomerId",
-                table: "Wallets",
-                column: "CustomerId",
-                unique: true);
         }
 
         /// <inheritdoc />
@@ -405,10 +403,16 @@ namespace G_Transport.Migrations
                 name: "Reviews");
 
             migrationBuilder.DropTable(
+                name: "TripDrivers");
+
+            migrationBuilder.DropTable(
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Drivers");
 
             migrationBuilder.DropTable(
                 name: "Trips");
@@ -420,16 +424,10 @@ namespace G_Transport.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Customers");
+                name: "Profiles");
 
             migrationBuilder.DropTable(
                 name: "Vehicles");
-
-            migrationBuilder.DropTable(
-                name: "Drivers");
-
-            migrationBuilder.DropTable(
-                name: "Profiles");
         }
     }
 }

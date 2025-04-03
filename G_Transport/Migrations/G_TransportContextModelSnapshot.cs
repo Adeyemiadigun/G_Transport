@@ -266,24 +266,24 @@ namespace G_Transport.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fa515cae-23c6-4750-ac32-e9909f8473f6"),
-                            DateCreated = new DateTime(2025, 3, 25, 18, 36, 49, 860, DateTimeKind.Utc).AddTicks(7343),
+                            Id = new Guid("4736f221-f829-4584-9431-52bdf9c10048"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1274),
                             Description = "System administrator",
                             IsDeleted = false,
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("f1c18b3e-a57d-4536-936d-1ff09af181d0"),
-                            DateCreated = new DateTime(2025, 3, 25, 18, 36, 49, 860, DateTimeKind.Utc).AddTicks(7375),
+                            Id = new Guid("736eb72f-d382-468f-963f-c70729f5bd45"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1283),
                             Description = "Registered driver",
                             IsDeleted = false,
                             Name = "Driver"
                         },
                         new
                         {
-                            Id = new Guid("03f5f273-5f82-4482-b5a2-2ef99f19c5f6"),
-                            DateCreated = new DateTime(2025, 3, 25, 18, 36, 49, 860, DateTimeKind.Utc).AddTicks(7381),
+                            Id = new Guid("a1c51e6e-7306-42ec-87b2-8af3f379bf52"),
+                            DateCreated = new DateTime(2025, 4, 3, 19, 39, 0, 877, DateTimeKind.Utc).AddTicks(1287),
                             Description = "Regular customer",
                             IsDeleted = false,
                             Name = "Customer"
@@ -302,8 +302,8 @@ namespace G_Transport.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateOnly>("DepartureDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DepartureDate")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<TimeSpan?>("DepartureTime")
                         .HasColumnType("time(6)");
@@ -334,6 +334,33 @@ namespace G_Transport.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("G_Transport.Models.Domain.TripDriver", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("DriverId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid>("TripId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DriverId");
+
+                    b.HasIndex("TripId");
+
+                    b.ToTable("TripDrivers");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.User", b =>
@@ -404,9 +431,6 @@ namespace G_Transport.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("char(36)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -420,36 +444,7 @@ namespace G_Transport.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DriverId")
-                        .IsUnique();
-
                     b.ToTable("Vehicles");
-                });
-
-            modelBuilder.Entity("G_Transport.Models.Domain.Wallet", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("WalletBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId")
-                        .IsUnique();
-
-                    b.ToTable("Wallets");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Booking", b =>
@@ -542,6 +537,25 @@ namespace G_Transport.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("G_Transport.Models.Domain.TripDriver", b =>
+                {
+                    b.HasOne("G_Transport.Models.Domain.Driver", "Driver")
+                        .WithMany("Trips")
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("G_Transport.Models.Domain.Trip", "Trip")
+                        .WithMany("Drivers")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("Trip");
+                });
+
             modelBuilder.Entity("G_Transport.Models.Domain.UserRole", b =>
                 {
                     b.HasOne("G_Transport.Models.Domain.Role", "Role")
@@ -561,28 +575,6 @@ namespace G_Transport.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("G_Transport.Models.Domain.Vehicle", b =>
-                {
-                    b.HasOne("G_Transport.Models.Domain.Driver", "Driver")
-                        .WithOne("Vehicle")
-                        .HasForeignKey("G_Transport.Models.Domain.Vehicle", "DriverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Driver");
-                });
-
-            modelBuilder.Entity("G_Transport.Models.Domain.Wallet", b =>
-                {
-                    b.HasOne("G_Transport.Models.Domain.Customer", "Customer")
-                        .WithOne("Wallet")
-                        .HasForeignKey("G_Transport.Models.Domain.Wallet", "CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("G_Transport.Models.Domain.Customer", b =>
                 {
                     b.Navigation("Bookings");
@@ -590,14 +582,11 @@ namespace G_Transport.Migrations
                     b.Navigation("Payments");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("Wallet")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Driver", b =>
                 {
-                    b.Navigation("Vehicle");
+                    b.Navigation("Trips");
                 });
 
             modelBuilder.Entity("G_Transport.Models.Domain.Profile", b =>
@@ -615,6 +604,8 @@ namespace G_Transport.Migrations
             modelBuilder.Entity("G_Transport.Models.Domain.Trip", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Drivers");
 
                     b.Navigation("Reviews");
                 });
