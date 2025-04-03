@@ -25,20 +25,30 @@ namespace G_Transport.Services.Implementations
         }
         public async Task<BaseResponse<TripDto>> CreateAsync(CreateTripRequestModel model)
         {
-            var vehicle = await _vehicleRepository.GetAsync(model.VehicleId);
             var trip = new Trip
             {
                 StartingLocation = model.StartingLocation,
                 Destination = model.Destination,
                 DepartureTime = model.DepartureTime,
                 DepartureDate = model.DepartureDate,
-                VehicleId = model.VehicleId,
-                Vehicle = vehicle,
                 Description = model.Description,
                 Amount = model.Amount,
+                VehicleId = model.VehicleId,
+                Vehicle = model.Vehicle,
             };
+
             await _tripRepository.CreateAsync(trip);
             await _unitOfWork.SaveChangesAsync();
+
+            var drivers = await _driverRepository.GetByIdsAsync(model.DriverIds);
+
+            // Assign the drivers to the trip
+            trip.Drivers = drivers;
+
+            // Save changes to establish the many-to-many relationship
+            await _unitOfWork.SaveChangesAsync();
+
+            // Return response DTO
             return new BaseResponse<TripDto>
             {
                 Message = "Trip created successfully",
@@ -48,10 +58,15 @@ namespace G_Transport.Services.Implementations
                     Id = trip.Id,
                     StartingLocation = trip.StartingLocation,
                     Destination = trip.Destination,
-                    DepartureTime = (TimeSpan)trip.DepartureTime,
+                    DepartureTime = (TimeSpan)trip.DepartureTime!,
                     DepartureDate = trip.DepartureDate,
-                    DriverNo = trip.Vehicle.Driver.DriverNo,
-                    DriverName = trip.Vehicle.Driver?.Profile?.FirstName + " " + trip.Vehicle.Driver?.Profile?.LastName,
+                    DriverNo = trip.Drivers.Count, // Number of drivers assigned
+                    Drivers = trip.Drivers.Select(d => new DriverDto
+                    {
+                        Id = d.Id,
+                        FirstName = d.Profile.FirstName,
+                        LastName = d.Profile.LastName
+                    }).ToList(),
                     VehicleId = trip.VehicleId,
                     Vehicle = trip.Vehicle,
                     Description = trip.Description,
@@ -60,6 +75,7 @@ namespace G_Transport.Services.Implementations
                 }
             };
         }
+
 
         public async Task<bool> DeleteAsync(Guid id)
         {
@@ -107,8 +123,13 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
                     Vehicle = x.Vehicle,
-                    DriverNo = x.Vehicle.Driver.DriverNo,
-                    DriverName = x.Vehicle.Driver?.Profile?.FirstName + " " + x.Vehicle.Driver?.Profile?.LastName,
+                    Drivers = x.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Id,
+                        FirstName = c.Profile.FirstName,
+                        LastName = c.Profile.LastName,
+                        DriverNo = c.DriverNo
+                    }).ToList(),
                     Description = x.Description,
                     Amount = x.Amount,
                     Status = x.Status
@@ -128,7 +149,7 @@ namespace G_Transport.Services.Implementations
             var trips = await _tripRepository.GetAllAsync(x => x.DepartureDate > currentDateTime, request);
 
 
-            if (trips == null || !trips.Items.Any())
+            if (trips == null)
             {
                 return new BaseResponse<PaginationDto<TripDto>>
                 {
@@ -155,8 +176,13 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
                     Vehicle = x.Vehicle,
-                    DriverNo = x.Vehicle.Driver.DriverNo,
-                    DriverName = x.Vehicle.Driver?.Profile?.FirstName + " " + x.Vehicle.Driver?.Profile?.LastName,
+                    Drivers = x.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Id,
+                        FirstName = c.Profile.FirstName,
+                        LastName = c.Profile.LastName,
+                        DriverNo = c.DriverNo
+                    }).ToList(),
                     Description = x.Description,
                     Amount = x.Amount,
                     Status = x.Status
@@ -164,7 +190,7 @@ namespace G_Transport.Services.Implementations
             };
 
             return new BaseResponse<PaginationDto<TripDto>>
-            {
+            { 
                 Status = true,
                 Message = "Upcoming trips retrieved successfully",
                 Data = result
@@ -201,8 +227,13 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
                     Vehicle = x.Vehicle,
-                    DriverNo = x.Vehicle.Driver.DriverNo,
-                    DriverName = x.Vehicle.Driver?.Profile?.FirstName + " " + x.Vehicle.Driver?.Profile?.LastName,
+                    Drivers = x.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Id,
+                        FirstName = c.Profile.FirstName,
+                        LastName = c.Profile.LastName,
+                        DriverNo = c.DriverNo
+                    }).ToList(),
                     Description = x.Description,
                     Amount = x.Amount,
                     Status = x.Status
@@ -247,8 +278,13 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
                     Vehicle = x.Vehicle,
-                    DriverNo = x.Vehicle.Driver.DriverNo,
-                    DriverName = x.Vehicle.Driver?.Profile?.FirstName + " " + x.Vehicle.Driver?.Profile?.LastName,
+                    Drivers = x.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Id,
+                        FirstName = c.Profile.FirstName,
+                        LastName = c.Profile.LastName,
+                        DriverNo = c.DriverNo
+                    }).ToList(),
                     Description = x.Description,
                     Amount = x.Amount,
                     Status = x.Status
@@ -287,8 +323,6 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = trip.DepartureDate,
                     VehicleId = trip.VehicleId,
                     Vehicle = trip.Vehicle,
-                    DriverNo = trip.Vehicle.Driver.DriverNo,
-                    DriverName = trip.Vehicle.Driver?.Profile?.FirstName + " " + trip.Vehicle.Driver?.Profile?.LastName,
                     Description = trip.Description,
                     Amount = trip.Amount,
                     Status = trip.Status,
@@ -312,7 +346,7 @@ namespace G_Transport.Services.Implementations
             }
 
             var today = DateTime.Now;
-            var trip = await _tripRepository.GetAsync(x => x.Vehicle.DriverId == driver.Id && x.DepartureDate == today);
+            var trip = await _tripRepository.GetAsync(x => x.Drivers.Contains(driver) && x.DepartureDate == today);
 
             if (trip == null)
             {
@@ -359,7 +393,6 @@ namespace G_Transport.Services.Implementations
             trip.DepartureTime = model.DepartureTime;
             trip.DepartureDate = model.DepartureDate;
             trip.Destination = model.Destination;
-            trip.VehicleId = model.VehicleId;
             trip.Amount = model.Amount;
             trip.Description = model.Description;
             trip.Status = model.Status;
@@ -377,8 +410,13 @@ namespace G_Transport.Services.Implementations
                     DepartureDate = trip.DepartureDate,
                     VehicleId = trip.VehicleId,
                     Vehicle = trip.Vehicle,
-                    DriverNo = trip.Vehicle.Driver.DriverNo,
-                    DriverName = trip.Vehicle.Driver?.Profile?.FirstName + " " + trip.Vehicle.Driver?.Profile?.LastName,
+                    Drivers = trip.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Id,
+                        FirstName = c.Profile.FirstName,
+                        LastName = c.Profile.LastName,
+                        DriverNo = c.DriverNo
+                    }).ToList(),
                     Description = trip.Description,
                     Amount = trip.Amount,
                     Status = trip.Status,

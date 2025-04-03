@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function unmarkTripAsBooked(tripId) {
   let button = document.querySelector(`#trip-${tripId}`);
   if (button) {
-    button.disabled = false; // Enable the button
+    button.disabled = false; 
     button.innerText = "Book Now";
     button.classList.remove("bg-gray-500");
     button.classList.add("bg-blue-500");
@@ -73,7 +73,6 @@ let displayTrip = async () =>
 displayTrip();
 
 let markTripAsBooked = (tripId, button) =>{
-  // Find the trip card container
   let tripCard = document.getElementById(`trip-${tripId}`);
 
   if (tripCard) {
@@ -129,7 +128,7 @@ async function payWithPaystack(email, amount, id) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: email,
-        amount: amount * 100, // Convert to kobo (Paystack uses Kobo)
+        amount: amount * 100,
         callbackUrl: "http://localhost:5500/Customer/callback.html",
         bookingId: id,
       }),
@@ -138,7 +137,7 @@ async function payWithPaystack(email, amount, id) {
 
   const data = await response.json();
   if (data.status) {
-    window.location.href = data.paymentUrl; // Redirect to Paystack UI
+    window.location.href = data.paymentUrl;
   } else {
     alert("Payment failed: " + data.message);
   }
@@ -171,12 +170,10 @@ let downloadTicket = (
   const { jsPDF } = window.jspdf;
   let doc = new jsPDF();
 
-  // Add title
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text("🎟 Trip Ticket", 20, 20);
 
-  // Add ticket details
   doc.setFont("helvetica", "normal");
   doc.setFontSize(12);
   doc.text(`Trip: ${startingLocation} to ${destination}`, 20, 40);
@@ -185,7 +182,6 @@ let downloadTicket = (
   doc.text(`Transaction ID: ${transaction}`, 20, 70);
   doc.text("Safe travels!", 20, 90);
 
-  // Save the PDF file
   doc.save(`Ticket_${ticketNumber}.pdf`);
 };
 

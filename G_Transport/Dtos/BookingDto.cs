@@ -1,4 +1,5 @@
-﻿using G_Transport.Models.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+using G_Transport.Models.Domain;
 using G_Transport.Models.Enums;
 
 namespace G_Transport.Dtos
@@ -15,7 +16,9 @@ namespace G_Transport.Dtos
     }
     public class  CreateBookingRequestModel
     {
+        [Required]
         public string StartingLocation { get; set; } = default!;
+        [Required]
         public string Destination { get; set; } = default!;
         public Status Status { get; set; }
         public Guid TripId { get; set; }

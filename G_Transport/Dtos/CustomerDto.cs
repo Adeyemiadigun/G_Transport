@@ -1,4 +1,5 @@
-﻿using G_Transport.Models.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+using G_Transport.Models.Enums;
 
 namespace G_Transport.Dtos
 {
@@ -18,13 +19,18 @@ namespace G_Transport.Dtos
     }
     public class RegisterCUstomerRequestModel
     {
+        [Required]
         public string FirstName { get; set; }
+        [Required]
         public string LastName { get; set; }
+        [Required]
         public string MiddleName { get; set; }
+        [EmailAddress]
         public string? Email { get; set; }
         public string? Password { get; set; }
         public Gender Gender { get; set; }
         public string? Address { get; set; }
+        [Phone]
         public string? PhoneNumber { get; set; }
     }
 }

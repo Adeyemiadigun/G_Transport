@@ -16,7 +16,7 @@ namespace G_Transport.Dtos
         public Guid VehicleId { get; set; }
         public Vehicle Vehicle { get; set; }
         public int DriverNo { get; set; }
-        public string DriverName { get; set; }
+        public ICollection<DriverDto> Drivers { get; set; } = new HashSet<DriverDto>();
     }
     public class CreateTripRequestModel
     {
@@ -27,7 +27,10 @@ namespace G_Transport.Dtos
         public DateTime DepartureDate { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
+
         public Guid VehicleId { get; set; }
+        public Vehicle Vehicle { get; set; }
+        public ICollection<Guid> DriverIds { get; set; } = new HashSet<Guid>();
     }
     public class UpdateTripRequestModel
     {
@@ -39,7 +42,6 @@ namespace G_Transport.Dtos
         public DateTime DepartureDate { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
-        public Guid VehicleId { get; set; }
     }
 
 }

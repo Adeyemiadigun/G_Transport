@@ -160,7 +160,7 @@ namespace G_Transport.Services.Implementations
             var payload = new
             {
                 email = request.Email,
-                amount = request.Amount, // Amount is in kobo
+                amount = request.Amount,
                 callback_url = request.CallbackUrl,
                 metadata = new { BookingId = request.BookingId }
             };

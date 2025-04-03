@@ -17,8 +17,6 @@ namespace G_Transport.Repositories.Implementations
         {
             var trips = _context.Set<Trip>()
               .Include(x => x.Vehicle)
-              .ThenInclude(x => x.Driver)
-              .ThenInclude(x => x.Profile)
               .AsQueryable();
             var totalRecord = trips.Count();
             var totalPages = totalRecord / request.PageSize;
@@ -44,8 +42,6 @@ namespace G_Transport.Repositories.Implementations
         {
             var trips = _context.Set<Trip>()
                .Include(x => x.Vehicle)
-               .ThenInclude(x => x.Driver)
-               .ThenInclude(x => x.Profile)
                .Where(exp);
 
             var totalRecord = trips.Count();

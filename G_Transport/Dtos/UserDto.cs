@@ -1,4 +1,5 @@
-﻿using G_Transport.Models.Domain;
+﻿using System.ComponentModel.DataAnnotations;
+using G_Transport.Models.Domain;
 
 namespace G_Transport.Dtos
 {
@@ -12,7 +13,9 @@ namespace G_Transport.Dtos
     }
     public class LoginRequestModel
     {
+        [Required]
         public required string Email { get; set; }
+        [Required]
         public required string Password { get; set; }
 
     }

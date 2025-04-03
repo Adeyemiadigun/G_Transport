@@ -1,25 +1,4 @@
-const fetchMembers = async () => {
-  const drivers = await fetch("https://localhost:7156/api/Driver/available", {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("userToken"),
-      "Content-Type": "application/json",
-    },
-  });
-  return drivers.json();
-};
-const displayMember = async () => {
-  const drivers = await fetchMembers();
-  let options = document.querySelector("#driverId");
-  console.log(drivers)
-  drivers.data.items.$values.forEach((driver) => {
-    options.innerHTML += `<option value="${driver.id}">${
-      driver.firstName + " " + driver.lastName
-    }</option>`;
-    console.log(driver.id);
-  });
-}
-displayMember();
+
 // Selecting input fields
 // Error messages array
 let errorMessages = [];
@@ -31,7 +10,6 @@ submitVehicleBtn.addEventListener("click", (e) => {
   let vehicleDescription = document.querySelector("#vehicleDescription");
   let vehicleCapacity = document.querySelector("#vehicleCapacity");
   let vehiclePlateNo = document.querySelector("#vehiclePlateNo");
-  let driverId = document.querySelector("#driverId");
   let validation = validateVehicleForm();
   if (!validation) {
     alert(errorMessages.join("\n"));
@@ -42,7 +20,6 @@ submitVehicleBtn.addEventListener("click", (e) => {
       description: vehicleDescription.value,
       capacity: parseInt(vehicleCapacity.value), // Convert to integer
       plateNo: vehiclePlateNo.value,
-      driverId: driverId.value, // Assuming driverId is a valid GUID string
     };
 
     // Send data to API

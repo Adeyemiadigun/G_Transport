@@ -8,7 +8,7 @@
         public int DriverNo { get; set; }
         public Guid ProfileId { get; set; }
         public Profile Profile { get; set; } = default!;
-        public Vehicle? Vehicle { get; set; }
+        public ICollection<Trip> Trips { get; set; } = new HashSet<Trip>();
         
     }
 }

@@ -1,4 +1,48 @@
+const fetchMembers = async () => {
+  try {
+    const response = await fetch(
+      "https://localhost:7156/api/Driver/available",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("userToken"),
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch drivers:", error);
+    return { data: { $values: [] } }; // Return empty data structure to prevent crashes
+  }
+};
+const displayMember = async () => {
+  const drivers = await fetchMembers();
+  let options = document.querySelector("#driverId");
 
+  if (!options) {
+    console.error("Driver select element not found.");
+    return;
+  }
+
+  // Clear previous options before adding new ones
+  options.innerHTML =
+    '<option value="" disabled selected>Select a driver</option>';
+
+  if (drivers.data && drivers.data.$values) {
+    drivers.data.$values.forEach((driver) => {
+      let option = document.createElement("option");
+      option.value = driver.id;
+      option.textContent = `${driver.firstName} ${driver.lastName}`;
+      options.appendChild(option);
+    });
+  }
+};
+
+displayMember();
 
 async function loadVehicles() {
   try {
@@ -27,7 +71,6 @@ async function loadVehicles() {
 }
 loadVehicles();
 
-
 async function loadTrips() {
   try {
     const response = await fetch(
@@ -40,40 +83,63 @@ async function loadTrips() {
         },
       }
     );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+    }
+
     const trips = await response.json();
     const tripList = document.getElementById("tripList");
     tripList.innerHTML = "";
-  console.log(trips)
-  
- if(trips.data == null)
- {
-  console.log(true)
-   tripList.innerHTML = `<tr class="m-4"><td colspan="9" class="text-center font-bold text-4xl ">No trips found.</td></tr>`;
-   return;
- }
+    console.log(trips);
+
+    if (
+      !trips.data ||
+      !trips.data.items ||
+      trips.data.items.$values.length === 0
+    ) {
+      tripList.innerHTML = `<tr class="m-4"><td colspan="9" class="text-center font-bold text-4xl">No trips found.</td></tr>`;
+      return;
+    }
+
     trips.data.items.$values.forEach((trip) => {
-      const row = `<tr class="border-b" id="row-${trip.id}">
-                        <td class="p-2">${trip.startingLocation} to ${trip.destination}</td>
-                        <td class="p-2">${trip.startingLocation}</td>
-                        <td class="p-2">${trip.destination}</td>
-                        <td class="p-2">${trip.departureTime}</td>
-                        <td class="p-2">${trip.departureDate}</td>
-                        <td class="p-2">${trip.vehicle.name || "N/A"}</td>
-                        <td class="p-2">${trip.driverName}</td>
-                        <td class="p-2">₦${trip.amount}</td>
-                        <td class="p-2">
-                            <button class="text-blue-500 mr-2">Edit</button>
-                            <button class="text-red-500" onclick="deleteTrip('${trip.id}')">Delete</button>
-                        </td>
-                    </tr>`;
+      let driverNames = "";
+      if (trip.drivers && trip.drivers.$values.length > 0) {
+        trip.drivers.$values.forEach((driver) => {
+          driverNames += `<p>${driver.firstName} ${driver.lastName}</p>`;
+        });
+      } else {
+        driverNames = "N/A";
+      }
+
+      const row = `
+        <tr class="border-b" id="row-${trip.id}">
+          <td class="p-2">${trip.startingLocation} to ${trip.destination}</td>
+          <td class="p-2">${trip.startingLocation}</td>
+          <td class="p-2">${trip.destination}</td>
+          <td class="p-2">${trip.departureTime}</td>
+          <td class="p-2">${trip.departureDate}</td>
+          <td class="p-2">${trip.vehicle?.name || "N/A"}</td>
+          <td class="p-2">${driverNames}</td>
+          <td class="p-2">₦${trip.amount}</td>
+          <td class="p-2">
+            <button class="text-blue-500 mr-2">Edit</button>
+            <button class="text-red-500" onclick="deleteTrip('${
+              trip.id
+            }')">Delete</button>
+          </td>
+        </tr>
+      `;
+
       tripList.innerHTML += row;
     });
-
   } catch (error) {
     console.error("Error loading trips:", error);
   }
 }
+
 loadTrips();
+
 
 async function deleteTrip(tripId) {
   if (!confirm("Are you sure you want to delete this trip?")) return;
@@ -103,34 +169,52 @@ async function deleteTrip(tripId) {
   }
 }
 
-
 document
   .getElementById("addTripForm")
   .addEventListener("submit", async function (event) {
     event.preventDefault();
+
+    // Collecting form data
     let tripData = {
       startingLocation: document.getElementById("startingLocation").value,
       destination: document.getElementById("destination").value,
       departureTime: document.getElementById("departureTime").value,
-      departureDate:"2025-03-26T08:00:00",
+      departureDate:
+        document.getElementById("departureDate").value +
+        "T" +
+        document.getElementById("departureTime").value, // Combine date and time
       description: document.getElementById("description").value,
       amount: parseFloat(document.getElementById("amount").value),
       vehicleId: document.getElementById("vehicleId").value,
       status: true,
+      driverIds: Array.from(
+        document.getElementById("driverId").selectedOptions
+      ).map((option) => option.value), // Collect selected driver IDs
     };
-    console.log(tripData)
+
+    // Ensure up to 3 drivers are selected
+    if (tripData.driverIds.length > 3) {
+      document.getElementById("driverLimitWarning").classList.remove("hidden");
+      return;
+    } else {
+      document.getElementById("driverLimitWarning").classList.add("hidden");
+    }
+
+    console.log(tripData);
+
     try {
       let response = await fetch("https://localhost:7156/api/Trip/create", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + localStorage.getItem("userToken"),
-         },
+        },
         body: JSON.stringify(tripData),
       });
 
       let result = await response.json();
       alert(result.message);
+
       if (result.status) {
         closeModal();
         await loadTrips();
@@ -140,9 +224,20 @@ document
     }
   });
 
+// Function to limit driver selection to 3
+function limitDriverSelection(selectElement) {
+  if (selectElement.selectedOptions.length > 3) {
+    document.getElementById("driverLimitWarning").classList.remove("hidden");
+  } else {
+    document.getElementById("driverLimitWarning").classList.add("hidden");
+  }
+}
+
 function openModal() {
   document.getElementById("tripModal").classList.remove("hidden");
 }
 function closeModal() {
   document.getElementById("tripModal").classList.add("hidden");
 }
+
+

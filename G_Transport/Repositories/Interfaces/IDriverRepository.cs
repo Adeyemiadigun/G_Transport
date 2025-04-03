@@ -10,6 +10,8 @@ namespace G_Transport.Repositories.Interfaces
         Task<Driver?> GetAsync(Expression<Func<Driver, bool>> exp);
         Task<PaginationDto<Driver>> GetAllAsync(PaginationRequest request);
         Task<ICollection<Driver>> GetAllAsync(Expression<Func<Driver,bool>> exp);
+        Task<ICollection<Driver>> GetByIdsAsync(ICollection<Guid> driverIds);
+
         Task<int> Count();
     }
 }

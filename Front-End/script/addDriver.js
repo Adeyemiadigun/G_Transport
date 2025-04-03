@@ -82,7 +82,7 @@ let formValidation = () =>
   if (!phoneNum.value.match(phoneRegex)) {
     isValid = false;
     errorMessages.push(
-      "Phone number must be in the format: +1 (123) 456-7890."
+      "Phone number must be in the format: +234 ."
     );
   }
 

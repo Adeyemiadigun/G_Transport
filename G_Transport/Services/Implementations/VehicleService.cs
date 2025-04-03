@@ -22,27 +22,13 @@ namespace G_Transport.Services.Implementations
 
         public async Task<BaseResponse<VehicleDto>> CreateAsync(RegisterVehicleRequestModel model)
         {
-            var driver = await _driverRepository.GetAsync(model.DriverId);
-            if (driver == null)
-            {
-                return new BaseResponse<VehicleDto>
-                {
-                    Status = false,
-                    Message = "Driver not found",
-                    Data = null
-                };
-            }
             var vehicle = new Vehicle
             {
                 Name = model.Name,
                 Description = model.Description,
                 Capacity = model.Capacity,
                 PlateNo = model.PlateNo,
-                Driver = driver,
-                DriverId = driver.Id
             };
-            driver.Vehicle = vehicle;
-             _driverRepository.Update(driver);
             await _vehicleRepository.CreateAsync(vehicle);
             await _unitOfWork.SaveChangesAsync();
             return new BaseResponse<VehicleDto>
@@ -56,8 +42,6 @@ namespace G_Transport.Services.Implementations
                     Description = vehicle.Description,
                     Capacity = vehicle.Capacity,
                     PlateNo = vehicle.PlateNo,
-                    DriverId = driver.Id,
-                    DriverNo = driver.DriverNo
                 }
             };
         }
@@ -105,8 +89,6 @@ namespace G_Transport.Services.Implementations
                     Description = x.Description,
                     Capacity = x.Capacity,
                     PlateNo = x.PlateNo,
-                    DriverId = x.DriverId,
-                    DriverNo = x.Driver.DriverNo
                 }).ToList()
             };
             return new BaseResponse<PaginationDto<VehicleDto>>
@@ -140,8 +122,6 @@ namespace G_Transport.Services.Implementations
                     Description = vehicle.Description,
                     Capacity = vehicle.Capacity,
                     PlateNo = vehicle.PlateNo,
-                    DriverId = vehicle.DriverId,
-                    DriverNo = vehicle.Driver.DriverNo
                 }
             };
         }

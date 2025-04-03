@@ -81,8 +81,8 @@ const fetchTrips = async () => {
 const displayTrips = async () => {
   const trip = await fetchTrips();
   let trips = document.querySelector("#trips");
-
-  trip.data.items.$values.every((element, index) => {
+  console.log(trip)
+  trip.$values.every((element, index) => {
     //+
     console.log(element);
     trips.innerHTML += `<div class="bg-gray-100 p-4 rounded-lg shadow">

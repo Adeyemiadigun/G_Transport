@@ -52,7 +52,6 @@ namespace G_Transport.Repositories.Implementations
         {
             var driversQuery = _context.Set<Driver>()
                 .Include(x => x.Profile) // Ensure Profile is included
-                .Include(x => x.Vehicle) // Ensure Vehicle is included
                 .Where(c => c.IsDeleted == false)
                 .AsQueryable();
 
@@ -81,8 +80,6 @@ namespace G_Transport.Repositories.Implementations
         {
             var drivers = await _context.Set<Driver>()
                            .Include(x => x.Profile)
-                           .Include(x => x.Vehicle)
-                           .ThenInclude(x => x!.trips)
                            .Where(exp)
                            .ToListAsync();
             return drivers;
@@ -93,8 +90,6 @@ namespace G_Transport.Repositories.Implementations
         {
             return await _context.Set<Driver>()
                 .Include(x => x.Profile)
-                .Include(x => x.Vehicle)
-                .ThenInclude(x => x!.trips)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
@@ -102,9 +97,14 @@ namespace G_Transport.Repositories.Implementations
         {
             return await _context.Set<Driver>()
                 .Include(x => x.Profile)
-                .Include(x => x.Vehicle)
-                .ThenInclude(x => x!.trips)
                 .FirstOrDefaultAsync(exp);
         }
+        public async Task<ICollection<Driver>> GetByIdsAsync(ICollection<Guid> driverIds)
+        {
+            return await _context.Drivers
+                .Where(d => driverIds.Contains(d.Id))
+                .ToListAsync();
+        }
+
     }
 }

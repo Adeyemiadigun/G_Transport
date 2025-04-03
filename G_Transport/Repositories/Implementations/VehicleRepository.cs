@@ -17,7 +17,6 @@ namespace G_Transport.Repositories.Implementations
         public async Task<PaginationDto<Vehicle>> GetAllAsync(PaginationRequest request)
         {
             var vehicles =  _context.Set<Vehicle>()
-            .Include(x => x.Driver)
             .Include(x => x.trips)
             .ThenInclude(x => x.Reviews)
             .AsQueryable();
@@ -43,7 +42,7 @@ namespace G_Transport.Repositories.Implementations
 
         public async Task<Vehicle?> GetAsync(Guid id)
         {
-            return await _context.Set<Vehicle>().Include(x => x.Driver)
+            return await _context.Set<Vehicle>()
                 .Include(x => x.trips)
                 .ThenInclude(x => x.Reviews)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -51,7 +50,7 @@ namespace G_Transport.Repositories.Implementations
 
         public async Task<Vehicle?> GetAsync(Expression<Func<Vehicle, bool>> exp)
         {
-            return await _context.Set<Vehicle>().Include(x => x.Driver)
+            return await _context.Set<Vehicle>()
                .Include(x => x.trips)
                .ThenInclude(x => x.Reviews)
                .FirstOrDefaultAsync(exp);

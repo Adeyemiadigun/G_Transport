@@ -83,6 +83,7 @@ namespace G_Transport.Services.Implementations
                     FirstName = driver.Profile.FirstName,
                     LastName = driver.Profile.LastName,
                     MiddleName = driver.Profile.MiddleName,
+                    DriverNo = driver.DriverNo,
                     PhoneNumber = driver.PhoneNumber,
                     Gender = driver.Profile.Gender,
                     DateCreated = driver.DateCreated,
@@ -165,8 +166,10 @@ namespace G_Transport.Services.Implementations
 
         public async Task<BaseResponse<ICollection<DriverDto?>>> GetAllAsync()
         {
-            var drivers = await _driverRepository.GetAllAsync( x => x.Vehicle == null);
-            if(drivers.Count == 0|| drivers is null)
+            var today = DateTime.UtcNow.Date;
+            var availableDrivers = await _driverRepository.GetAllAsync(d =>
+                !d.Trips.Any(t => t.DepartureDate.Date == today));
+            if (availableDrivers.Count == 0|| availableDrivers is null)
             {
                 return new BaseResponse<ICollection<DriverDto?>>
                 {
@@ -175,7 +178,7 @@ namespace G_Transport.Services.Implementations
                     Data = null
                 };
             }
-            var items = drivers.Select(x => new DriverDto
+            var items = availableDrivers.Select(x => new DriverDto
             {
                 Id = x.Id,
                 Email = x.Email,
@@ -203,7 +206,7 @@ namespace G_Transport.Services.Implementations
                 return new BaseResponse<DriverDto>
                 { 
                     Data = null,
-                    Message = "nit found",
+                    Message = "not found",
                     Status = false
                 };
             }
