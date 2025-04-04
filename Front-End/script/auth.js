@@ -81,14 +81,15 @@
       "Content-Type": "application/json",
     },
     body: JSON.stringify(loginData),
-  })
+  }
+)
     .then(async (res) => await res.json())
     .then((response) => {
+      console.log(response.token)
       localStorage.removeItem("userToken");
       localStorage.setItem("userToken",response.token);
       // localStorage.setItem("response", JSON.stringify(response.token));
-      console.log(response.data);
-      alert(response.data.message);
+      console.log(response.token);
     })
     .catch((error) => {
       alert("Error: " + error);

@@ -21,29 +21,39 @@ const fetchMembers = async () => {
 };
 const displayMember = async () => {
   const drivers = await fetchMembers();
-  let options = document.querySelector("#driverId");
+  const driverList = document.querySelector("#driverList");
 
-  if (!options) {
-    console.error("Driver select element not found.");
+  // Clear previous checkboxes
+  if (drivers.data.$values.length === 0) {
+    driverList.innerHTML = "No available drivers.";
     return;
   }
 
-  // Clear previous options before adding new ones
-  options.innerHTML =
-    '<option value="" disabled selected>Select a driver</option>';
+  driverList.innerHTML = ""; // Reset container
 
-  if (drivers.data && drivers.data.$values) {
-    drivers.data.$values.forEach((driver) => {
-      let option = document.createElement("option");
-      option.value = driver.id;
-      option.textContent = `${driver.firstName} ${driver.lastName}`;
-      options.appendChild(option);
-    });
-  }
+  drivers.data.$values.forEach((driver) => {
+    driverList.innerHTML += `
+            <div class="flex items-center space-x-2 mb-1">
+                <input type="checkbox" value="${driver.id}" name="driverIds" class="driverCheckbox" onchange="limitDriverSelection()">
+                <label>${driver.firstName} ${driver.lastName}</label>
+            </div>
+        `;
+  });
 };
-
 displayMember();
 
+let limitDriverSelection = () => {
+  const selected = document.querySelectorAll(".driverCheckbox:checked");
+  const warning = document.getElementById("driverLimitWarning");
+
+  if (selected.length > 3) {
+    // Uncheck the last one that triggered it
+    selected[selected.length - 1].checked = false;
+    warning.classList.remove("hidden");
+  } else {
+    warning.classList.add("hidden");
+  }
+};
 async function loadVehicles() {
   try {
     const response = await fetch(
@@ -188,8 +198,8 @@ document
       vehicleId: document.getElementById("vehicleId").value,
       status: true,
       driverIds: Array.from(
-        document.getElementById("driverId").selectedOptions
-      ).map((option) => option.value), // Collect selected driver IDs
+        document.querySelectorAll(".driverCheckbox:checked")
+      ).map((checkbox) => checkbox.value), // Collect selected driver IDs
     };
 
     // Ensure up to 3 drivers are selected
@@ -225,13 +235,6 @@ document
   });
 
 // Function to limit driver selection to 3
-function limitDriverSelection(selectElement) {
-  if (selectElement.selectedOptions.length > 3) {
-    document.getElementById("driverLimitWarning").classList.remove("hidden");
-  } else {
-    document.getElementById("driverLimitWarning").classList.add("hidden");
-  }
-}
 
 function openModal() {
   document.getElementById("tripModal").classList.remove("hidden");

@@ -55,8 +55,8 @@
     </div>
 
     <!-- Add Trip Modal -->
-<div id="tripModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+<div id="tripModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center overflow-auto">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-xl w-full overflow-auto ">
     <h2 class="text-xl font-semibold mb-4">Add New Trip</h2>
     <form id="addTripForm" class="space-y-4">
       <div>
@@ -98,13 +98,13 @@
         </select>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium">Select Drivers (Max: 3)</label>
-        <select id="driverId" class="w-full p-2 border rounded" multiple onchange="limitDriverSelection(this)">
-          <!-- Drivers will be loaded dynamically -->
-        </select>
-        <p id="driverLimitWarning" class="text-red-500 text-sm hidden">You can select up to 3 drivers only.</p>
-      </div>
+    <div>
+    <label class="block text-sm font-medium">Select Drivers (Max: 3)</label>
+    <div id="driverList" class="border p-2 rounded max-h-32 overflow-y-auto">
+        <!-- Drivers will be added dynamically here -->
+    </div>
+    <p id="driverLimitWarning" class="text-red-500 text-sm hidden">You can select up to 3 drivers only.</p>
+</div>
 
       <div class="flex justify-end">
         <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>

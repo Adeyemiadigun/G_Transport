@@ -79,13 +79,6 @@ let validateVehicleForm = () => {
     errorMessages.push("Vehicle plate number cannot be empty.");
   }
 
-  let guidRegex =
-    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-  if (!driverId.value.match(guidRegex)) {
-    isValid = false;
-    errorMessages.push("Invalid driver ID format.");
-  }
-
   return isValid;
 };
 
