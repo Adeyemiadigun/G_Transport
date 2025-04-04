@@ -47,8 +47,7 @@ namespace G_Transport.Services.Implementations
                 Vehicle = vehicle
             };
 
-            await _tripRepository.CreateAsync(trip);
-            await _unitOfWork.SaveChangesAsync(); 
+         
             var drivers = await _driverRepository.GetByIdsAsync(model.DriverIds);
             if (drivers.Count != model.DriverIds.Count)
             {
@@ -68,6 +67,7 @@ namespace G_Transport.Services.Implementations
             }).ToList();
 
             trip.Drivers = tripDrivers;
+            await _tripRepository.CreateAsync(trip);
             await _unitOfWork.SaveChangesAsync(); 
 
             return new BaseResponse<TripDto>

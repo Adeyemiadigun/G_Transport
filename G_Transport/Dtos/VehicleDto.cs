@@ -9,8 +9,6 @@ namespace G_Transport.Dtos
         public string Description { get; set; }
         public int Capacity { get; set; }
         public string PlateNo { get; set; }
-        public int DriverNo { get; set; }
-        public Guid DriverId { get; set; }
     }
     public class RegisterVehicleRequestModel
     {
@@ -18,6 +16,5 @@ namespace G_Transport.Dtos
         public string Description { get; set; }
         public int Capacity { get; set; }
         public string PlateNo { get; set; }
-        public Guid DriverId { get; set; }
     }
 }

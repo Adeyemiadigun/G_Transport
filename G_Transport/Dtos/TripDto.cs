@@ -27,9 +27,7 @@ namespace G_Transport.Dtos
         public DateTime DepartureDate { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
-
         public Guid VehicleId { get; set; }
-        public Vehicle Vehicle { get; set; }
         public ICollection<Guid> DriverIds { get; set; } = new HashSet<Guid>();
     }
     public class UpdateTripRequestModel

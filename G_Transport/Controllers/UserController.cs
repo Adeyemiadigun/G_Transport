@@ -28,7 +28,7 @@ namespace G_Transport.Controllers
             if (response.Status)
             {
                 var token = _authService.GenerateJwtToken(response.Data);
-                return Ok(new { Token = token, Data = response});
+                return Ok(new { Token = token});
             }
             return BadRequest(response);
 

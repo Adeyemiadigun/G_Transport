@@ -72,7 +72,6 @@ namespace G_Transport.Services.Implementations
                 Role = role,
                 User = user
             };
-         
             await _userRoleRepository.CreateAsync(userRole);
             await _userRepository.CreateAsync(user);
             await _customerRepository.CreateAsync(customer);

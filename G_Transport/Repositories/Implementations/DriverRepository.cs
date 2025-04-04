@@ -102,6 +102,7 @@ namespace G_Transport.Repositories.Implementations
         public async Task<ICollection<Driver>> GetByIdsAsync(ICollection<Guid> driverIds)
         {
             return await _context.Drivers
+                .Include(d => d.Profile)
                 .Where(d => driverIds.Contains(d.Id))
                 .ToListAsync();
         }
