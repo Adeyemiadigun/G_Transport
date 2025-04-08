@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using G_Transport.Models.Enums;
 using Org.BouncyCastle.Asn1.X509;
 
 namespace G_Transport.Models.Domain
@@ -7,7 +8,7 @@ namespace G_Transport.Models.Domain
     {
         public string StartingLocation { get; set; }
         public string Destination { get; set; }
-        public bool Status { get; set; }
+        public Status Status { get; set; }
         public string Description { get; set; }
         public decimal Amount { get; set; }
         public Guid VehicleId {  get; set; }

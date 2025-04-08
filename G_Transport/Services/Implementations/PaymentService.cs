@@ -194,7 +194,7 @@ namespace G_Transport.Services.Implementations
 
             var response = await _httpClient.GetAsync($"https://api.paystack.co/transaction/verify/{reference}");
             var result = await response.Content.ReadAsStringAsync();
-            var jsonResponse = JsonSerializer.Deserialize<PaystackVerifyResponse>(result);
+            var jsonResponse = JsonConvert.DeserializeObject<PaystackVerifyResponse>(result);
 
             if (jsonResponse == null || jsonResponse.data == null)
             {

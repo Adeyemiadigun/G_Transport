@@ -22,7 +22,7 @@ namespace G_Transport.Repositories.Implementations
                           .AsQueryable();
             var totalRecord = payment.Count();
             var totalPages = totalRecord / request.PageSize;
-            var result = await _context.Set<Payment>()
+            var result = await payment
             .Skip((request.CurrentPage - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();
@@ -50,8 +50,7 @@ namespace G_Transport.Repositories.Implementations
                           .AsQueryable();
             var totalRecord = payment.Count();
             var totalPages = totalRecord / request.PageSize;
-            var result = await _context.Set<Payment>()
-            .Skip((request.CurrentPage - 1) * request.PageSize)
+            var result = await payment.Skip((request.CurrentPage - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .ToListAsync();
 

@@ -19,7 +19,7 @@
                     <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Manage Reviews</a></li>
                     <li><a href="/Admin/addDriver.html" class="block p-2 hover:bg-gray-200 rounded">Add Driver</a></li>
                     <li><a href="/Admin/addVehicle.html" class="block p-2 hover:bg-gray-200 rounded">Add Vehicle</a></li>
-                    <li><a href="/Auth/Auth.html" class="block p-2 hover:bg-red-200 rounded text-red-500">Logout</a></li>
+                <li><a href="#" class="block text-red-500 p-2 hover:bg-red-100 rounded" id="Logout">Logout</a></li>
                 </ul>
             </nav>
         </aside>
@@ -28,7 +28,7 @@
         <main class="flex-1 p-8 overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Manage Trips</h1>
-                <button onclick="openModal()" class="bg-blue-500 text-white px-4 py-2 rounded">+ Add Trip</button>
+                <button class="bg-blue-500 text-white px-4 py-2 rounded" id="openModal">+ Add Trip</button>
             </div>
 
             <div class="bg-white p-6 shadow rounded-lg">
@@ -107,8 +107,41 @@
 </div>
 
       <div class="flex justify-end">
-        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
+        <button type="button" id="closeModal"  class="px-4 py-2 bg-gray-300 rounded mr-2">Cancel</button>
         <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Add Trip</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+  <div class="bg-white p-6 rounded shadow-lg w-[90%] max-w-xl relative">
+    <h2 class="text-2xl font-bold mb-4">Edit Trip</h2>
+    <form id="editForm" class="space-y-4">
+      <input type="hidden" id="tripId" />
+      
+      <input type="text" id="estartingLocation" class="w-full p-2 border rounded"  />
+      <input type="text" id="edestination" class="w-full p-2 border rounded" />
+      <input type="date" id="edepartureDate" class="w-full p-2 border rounded" />
+      <input type="time" id="edepartureTime" class="w-full p-2 border rounded" />
+      <input type="number" id="eamount" class="w-full p-2 border rounded"  />
+
+      <!-- Vehicle Selection -->
+      <div>
+        <label for="vehicleId" class="font-semibold mb-1">Select Vehicle</label>
+        <select id="evehicleId" class="w-full p-2 border rounded">
+        </select>
+      </div>
+
+      <div>
+        <p class="font-semibold mb-1">Select Drivers (max 3)</p>
+        <div id="edriverList" class="max-h-40 overflow-y-auto border p-2 rounded"></div>
+        <p id="driverLimitWarning" class="text-red-500 text-sm hidden">You can select up to 3 drivers only.</p>
+      </div>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" id="closeMod" class="text-gray-500">Cancel</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update</button>
       </div>
     </form>
   </div>
@@ -116,6 +149,7 @@
 
 
 
-    <script src="/script/manageTrips.js"></script>
+
+    <script type="module" src="/script/manageTrips.js"></script>
 </body>
 </html>

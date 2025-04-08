@@ -1,3 +1,6 @@
+import { logout } from "./logout.js";
+logout();
+
 const fetchTrips = async () => {
   const trips = await fetch(
     "https://localhost:7156/api/Trip/available?PageSize=10&CurrentPage=1",
@@ -6,7 +9,7 @@ const fetchTrips = async () => {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("userToken"),
-      },
+      },  
     }
   );
   return trips.json();
@@ -14,24 +17,29 @@ const fetchTrips = async () => {
 const displayTrips = async () => {
   const trip = await fetchTrips();
   let trips = document.querySelector("#trips");
+console.log(trip)
+  trip.data.items.$values.forEach((element) => {
+     let driverNames = "";
 
-  trip.data.items.$values.foreach(element => {
+     element.drivers.$values.forEach((driver) => {
+       driverNames += `<p>${driver.firstName} ${driver.lastName}</p>`;
+     });
     console.log(element);
-    trips.innerHTML += `<tr class="border-b" id="row-${trip.id}">
-                        <td class="p-2">${trip.startingLocation} to ${
-      trip.destination
+    trips.innerHTML += `<tr class="border-b" id="row-${element.id}">
+                        <td class="p-2">${element.startingLocation} to ${
+      element.destination
     }</td>
-                        <td class="p-2">${trip.startingLocation}</td>
-                        <td class="p-2">${trip.destination}</td>
-                        <td class="p-2">${trip.departureTime}</td>
-                        <td class="p-2">${trip.departureDate}</td>
-                        <td class="p-2">${trip.vehicle.name || "N/A"}</td>
-                        <td class="p-2">${trip.driverName}</td>
-                        <td class="p-2">₦${trip.amount}</td>
+                        <td class="p-2">${element.startingLocation}</td>
+                        <td class="p-2">${element.destination}</td>
+                        <td class="p-2">${element.departureTime}</td>
+                        <td class="p-2">${element.departureDate}</td>
+                        <td class="p-2">${element.vehicleName || "N/A"}</td>
+                        <td class="p-2">${driverNames}</td>
+                        <td class="p-2">₦${element.amount}</td>
                         <td class="p-2">
                             <button class="text-blue-500 mr-2">Edit</button>
                             <button class="text-red-500" onclick="deleteTrip('${
-                              trip.id
+                              element.id
                             }')">Delete</button>
                         </td>
                     </tr>`;

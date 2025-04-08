@@ -14,10 +14,9 @@
             <nav>
                 <ul class="space-y-4">
                     <li><a href="#" class="block p-2 bg-gray-200 rounded">Home</a></li>
-                    <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Assigned Trip</a></li>
                     <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Previous Trips</a></li>
                     <li><a href="#" class="block p-2 hover:bg-gray-200 rounded">Profile</a></li>
-                    <li><a href="#" class="block p-2 hover:bg-red-200 rounded text-red-500">Logout</a></li>
+                    <li><a href="#" class="block p-2 hover:bg-red-200 rounded text-red-500" id="Logout">Logout</a></li>
                 </ul>
             </nav>
         </aside>
@@ -29,8 +28,8 @@
             <!-- Assigned Trip -->
             <div class="bg-white p-6 shadow rounded-lg mb-6">
                 <h2 class="text-xl font-semibold mb-4">Assigned Trip</h2>
-                <div class="bg-gray-100 p-4 rounded-lg shadow" id="assignedTrip">
-                    
+                <div class="bg-gray-100 p-4 rounded-lg shadow space-y-4" id="assignedTrip">
+                    <!-- Content populated via JS -->
                 </div>
             </div>
 
@@ -62,6 +61,6 @@
         </main>
     </div>
 
-    <script src="/script/DriverDash.js"></script>
+    <script type="module" src="/script/DriverDash.js"></script>
 </body>
 </html>

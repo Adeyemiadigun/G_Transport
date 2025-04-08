@@ -1,6 +1,9 @@
+import { logout } from "./logout.js";
+logout();
+
 async function fetchPayments() {
   let response = await fetch(
-    "https://localhost:7156//api/Payment/customer-payments",
+    "https://localhost:7156/api/Payment/customer-payments?PageSize=10&CurrentPage=1",
     {
       method: "GET",
       headers: {
@@ -11,12 +14,14 @@ async function fetchPayments() {
   );
 
   let data = await response.json();
+  console.log(data)
    if (data.data == null) {
      console.log(true);
      tripList.innerHTML = `<tr class="m-4"><td colspan="9" class="text-center font-bold text-4xl ">No payment found.</td></tr>`;
      return;
    }
   if (data.status) {
+    console.log("entered here")
     let payments = data.data.items;
     let tableBody = document.getElementById("paymentTableBody");
     tableBody.innerHTML = "";
@@ -26,16 +31,18 @@ async function fetchPayments() {
                         <td class='border p-2'>${payment.refrenceNo}</td>
                         <td class='border p-2'>${payment.transaction}</td>
                         <td class='border p-2'>₦${payment.amount}</td>
-                        <td class='border p-2'>${payment.status}</td>
+                        <td class='border p-2'>${payment.status == 2 ? "Successful" : "Failed" }</td>
                         <td class='border p-2'>${new Date(
                           payment.dateCreated
                         ).toLocaleDateString()}</td>
                         <td class='border p-2'><button class='bg-blue-500 text-white px-3 py-1 rounded'  id ="downloadBtn">Download</button></td>
                     </tr>`;
       tableBody.innerHTML += row;
+      console.log(payment)
       document.querySelector("#downloadBtn").addEventListener("click", ()=>
       {
-          downloadReceipt(payment.refrenceNo, payment.transaction,payment.amount,payment.status.payment.dateCreated);
+        console.log(payment.dateCreated)
+          downloadReceipt(payment.refrenceNo, payment.transaction,payment.amount,payment.status,payment.dateCreated);
       })
     });
   } else {
@@ -52,6 +59,12 @@ function downloadReceipt(
   status,
   dateCreated
 ) {
+  let stat ;
+  if(status == 2) {
+    stat = "Successful";
+  } else {
+    stat = "Failed";
+  }
   alert("Downloading receipt for: " + referenceNo);
   const { jsPDF } = window.jspdf;
   let doc = new jsPDF();
@@ -67,11 +80,11 @@ function downloadReceipt(
   doc.text(`Ref-No: ${referenceNo}`, 20, 40);
   doc.text(`Tansaction No: ${transaction}`, 20, 50);
   doc.text(`Amount Paid: ₦${amount}`, 20, 60);
-  doc.text(`status: ${status}`, 20, 70);
+  doc.text(`status: ${stat}`, 20, 70);
   doc.text(`Date : ${dateCreated}`, 20, 90);
 
   // Save the PDF file
-  doc.save(`Ticket_${receipt}.pdf`);
+  doc.save(`Ticket_receipt.pdf`);
 }
 
 fetchPayments();

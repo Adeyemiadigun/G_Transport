@@ -1,4 +1,5 @@
-
+import { logout } from "./logout.js";
+logout();
 // Selecting input fields
 // Error messages array
 let errorMessages = [];

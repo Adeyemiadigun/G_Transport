@@ -45,7 +45,8 @@ namespace G_Transport.Controllers
                 return NotFound(response);
             return Ok(response);
         }
-        //[Authorize(Roles = "Admin")]
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("available")]
         public async Task<IActionResult> GetAllAvailableDrivers()
         {

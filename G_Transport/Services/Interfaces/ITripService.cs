@@ -9,6 +9,7 @@ namespace G_Transport.Services.Interfaces
         Task<BaseResponse<TripDto>> CreateAsync(CreateTripRequestModel model);
         Task<bool> DeleteAsync(Guid id);
         Task<BaseResponse<PaginationDto<TripDto>>> GetAllAsync(PaginationRequest request);
+        Task<BaseResponse<PaginationDto<TripDto>>> GetAllCustomerTrip(PaginationRequest request);
         Task<BaseResponse<PaginationDto<TripDto>>> GetAllAvailableAsync(PaginationRequest request);
         Task<BaseResponse<PaginationDto<TripDto>>> GetAllRecent(PaginationRequest request);
         Task<BaseResponse<PaginationDto<TripDto>>> GetAllWithoutReviewAsync(PaginationRequest request);
@@ -16,6 +17,7 @@ namespace G_Transport.Services.Interfaces
         Task<BaseResponse<TripDto>> GetAsync(Expression<Func<Trip, bool>> exp);
         Task<BaseResponse<TripDto>> GetDriverAssigned();
         int TripCount(Expression<Func<Trip, bool>> exp);
+        Task<BaseResponse<bool>> TriggerTripStatus(TriggerTripStatus model);
 
     }
 }

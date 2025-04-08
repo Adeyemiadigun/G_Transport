@@ -3,6 +3,7 @@ using System;
 using G_Transport.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace G_Transport.Migrations
 {
     [DbContext(typeof(G_TransportContext))]
-    partial class G_TransportContextModelSnapshot : ModelSnapshot
+    [Migration("20250406015845_updateTrip")]
+    partial class updateTrip
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

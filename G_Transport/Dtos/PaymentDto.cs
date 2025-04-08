@@ -58,9 +58,9 @@ namespace G_Transport.Dtos
     public class PaystackVerifyData
     {
         public string id { get; set; }
-        public string status { get; set; }  // "success", "failed", "abandoned"
+        public string status { get; set; }  
         public string reference { get; set; }
-        public int amount { get; set; } // In kobo
+        public int amount { get; set; }
         public string gateway_response { get; set; }
         public string paid_at { get; set; }
         public string created_at { get; set; }

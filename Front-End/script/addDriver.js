@@ -1,3 +1,5 @@
+import { logout } from "./logout.js";
+logout();
 let firsName = document.querySelector("#firstName");
 let lastName = document.querySelector("#lastName");
 let middleName = document.querySelector("#middleName");
@@ -48,6 +50,7 @@ let postEvent = (eventBody) => {
     .then((response) => {
       console.log(response);
       alert(response.message);
+      
     })
     .catch((error) => {
       alert(error);
@@ -151,7 +154,8 @@ fetch("https://localhost:7156/api/Driver/all?PageSize=10&CurrentPage=1", {
   .catch((error) => console.error("Error:", error));
 }
 viewDriver();
-
+document.querySelector("#openModal").addEventListener("click",openModal)
+document.querySelector("#closeModal").addEventListener("click",closeModal)
 function openModal() {
   document.getElementById("driverModal").classList.remove("hidden");
 }

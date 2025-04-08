@@ -17,6 +17,9 @@ namespace G_Transport.Repositories.Implementations
         {
             var trips = _context.Set<Trip>()
               .Include(x => x.Vehicle)
+              .Include(x=> x.Drivers)
+              .ThenInclude(x => x.Driver)
+              .ThenInclude(x => x.Profile)
               .AsQueryable();
             var totalRecord = trips.Count();
             var totalPages = totalRecord / request.PageSize;
@@ -42,6 +45,9 @@ namespace G_Transport.Repositories.Implementations
         {
             var trips = _context.Set<Trip>()
                .Include(x => x.Vehicle)
+               .Include(x => x.Drivers)
+              .ThenInclude(x => x.Driver)
+              .ThenInclude(x => x.Profile)
                .Where(exp);
 
             var totalRecord = trips.Count();
@@ -71,7 +77,12 @@ namespace G_Transport.Repositories.Implementations
 
         public async Task<Trip?> GetAsync(Expression<Func<Trip, bool>> exp)
         {
-            return await _context.Set<Trip>().FirstOrDefaultAsync(exp);
+            return await _context.Set<Trip>()
+                .Include(x => x.Vehicle)
+                .Include(x => x.Drivers)
+                .ThenInclude(x => x.Driver)
+                .ThenInclude(x => x.Profile)
+                .FirstOrDefaultAsync(exp);
         }
         public int GetAll(Expression<Func<Trip, bool>> exp)
         {

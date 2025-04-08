@@ -81,8 +81,7 @@ namespace G_Transport.Services.Implementations
                     Data = null
                 };
             }
-            var profile = await _profileRepository.GetAsync(x => x.Id == customer.ProfileId);
-            if (profile == null)
+            if (customer.Profile == null)
             {
                 return new BaseResponse<ProfileDto>
                 {
@@ -91,24 +90,24 @@ namespace G_Transport.Services.Implementations
                     Data = null
                 };
             }
-            profile.FirstName = model.FirstName;
-            profile.LastName = model.LastName;
-            profile.MiddleName = model.MiddleName;
-            profile.ImageUrl = model.ImageUrl;
-            _profileRepository.Update(profile);
-            _unitOfWork.SaveChangesAsync();
+            customer.Profile.FirstName = model.FirstName;
+            customer.Profile.LastName = model.LastName;
+            customer.Profile.MiddleName = model.MiddleName;
+            customer.Profile.ImageUrl = model.ImageUrl;
+            _profileRepository.Update(customer.Profile);
+            await _unitOfWork.SaveChangesAsync();
             return new BaseResponse<ProfileDto>
             {
                 Message = "Profile Updated Successfully",
                 Status = true,
                 Data = new ProfileDto
                 {
-                    Id = profile.Id,
+                    Id = customer.Profile.Id,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     MiddleName = model.MiddleName,
                     ImageUrl = model.ImageUrl,
-                    Gender = profile.Gender
+                    Gender = customer.Profile.Gender
                 }
             };
         }

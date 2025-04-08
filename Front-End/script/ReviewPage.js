@@ -1,3 +1,6 @@
+
+import { logout } from "./logout.js";
+logout();
 let fetchTrip = async () => {
   let response = await fetch(
     "https://localhost:7156/api/Trip/without-review?PageSize=10&CurrentPage=1",
@@ -14,11 +17,16 @@ let fetchTrip = async () => {
 
 let displayTrips = async () => {
   let tripData = await fetchTrip();
-  tripData.data.data.$values.forEach((trip) =>
+  console.log(tripData)
+  let option = document.querySelector("#trip-select");
+  if (tripData.message == "No trips found")
   {
-      let option = document.querySelector("#trip-select");
-      option += `<option value="${trip.id}">${trip.startingLocation} to ${trip.destination}</option>`
-  })
+    alert(tripData.message)
+    return 
+  }
+    tripData.data.items.$values.forEach((trip) => {
+      option.innerHTML += `<option value="${trip.id}">${trip.startingLocation} to ${trip.destination}</option>`;
+    });
 }
 await displayTrips();
 
@@ -51,7 +59,7 @@ document.querySelector("#review-form").addEventListener("submit", async (event) 
 
 
 let fetchTripDetails = async (tripId) => {
-  let response = await fetch(`https://localhost:7156/api/trip/${tripId}`, {
+  let response = await fetch(`https://localhost:7156/api/Trip/${tripId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -60,15 +68,31 @@ let fetchTripDetails = async (tripId) => {
   });
   return response.json();
 };
+let fetchReviews = async () => 
+{
+  let response = await fetch(
+    `https://localhost:7156/api/reviews/customer?PageSize=10&CurrentPage=1`,
+    {
+      method:"GET",
+      headers : {
+        "Content-Type" : "application/json",
+        Authorization: "Bearer " + localStorage.getItem("userToken"),
+      },
+    }
+  );
+  console.log("fetched reviews")
+  return response.json()
+}
 
-// Display previous reviews and their trip details (toggleable)
 let loadPreviousReviews = async () => {
+  console.log("entered reviewLoader")
   let reviews = await fetchReviews();
-  let reviewContainer = document.querySelector("#previous-reviews");
-
-  for (let review of reviews) {
+  console.log(reviews)
+  let reviewContainer = document.querySelector("#reviews-list");
+  let reviewData = reviews.data.items.$values; 
+  for (let review of reviewData) {
     let trip = await fetchTripDetails(review.tripId);
-
+      console.log(trip)
   reviewContainer.innerHTML += `<div class= "bg-white p-4 shadow rounded-lg mb-4"> <p class="text-lg font-semibold">Rating: ${"⭐".repeat(
     review.rating
   )}</p>
@@ -79,17 +103,16 @@ let loadPreviousReviews = async () => {
             </button>
             
             <div class="trip-details hidden mt-2 p-4 border rounded bg-gray-100">
-                <p><strong>From:</strong> ${trip.startingLocation}</p>
-                <p><strong>To:</strong> ${trip.destination}</p>
+                <p><strong>From:</strong> ${trip.data.startingLocation}</p>
+                <p><strong>To:</strong> ${trip.data.destination}</p>
                 <p><strong>Date:</strong> ${new Date(
-                  trip.departureDate
+                  trip.data.departureDate
                 ).toLocaleDateString()}</p>
-                <p><strong>Price:</strong> $${trip.price}</p>
+                <p><strong>Price:</strong> $${trip.data.amount}</p>
             </div>
         `;
 
   }
-
   // Add toggle event to each button
   document.querySelectorAll(".toggle-trip-details").forEach((button) => {
     button.addEventListener("click", function () {
@@ -97,6 +120,6 @@ let loadPreviousReviews = async () => {
     });
   });
 };
-
+loadPreviousReviews()
 // Load reviews when the page loads
 document.addEventListener("DOMContentLoaded", loadPreviousReviews);

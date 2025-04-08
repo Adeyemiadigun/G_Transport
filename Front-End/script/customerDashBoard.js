@@ -1,3 +1,6 @@
+import { logout } from "./logout.js";
+logout(); 
+
 let Count = async (url) => {
   let response = await fetch(`${url}`, {
     method: "GET",
@@ -17,7 +20,6 @@ let customerTrip = async () => {
   document.querySelector("#tripCount").innerHTML = response.CustomerTrip || 0;
 };
 
-
 let pendingReview = async () => {
   let response = await Count(
     "https://localhost:7156/api/Trip/Customer-Trips-pending-review"
@@ -27,11 +29,10 @@ let pendingReview = async () => {
 };
 let currentCustomer;
 
-(async () => 
-{
+(async () => {
   await customerTrip();
   await pendingReview();
-})()
+})();
 let postEvent = async () => {
   try {
     let response = await fetch("https://localhost:7156/api/Customer/profile", {
@@ -81,19 +82,31 @@ const fetchTrips = async () => {
 const displayTrips = async () => {
   const trip = await fetchTrips();
   let trips = document.querySelector("#trips");
-  console.log(trip)
-  trip.$values.every((element, index) => {
-    //+
+  console.log(trip);
+  let element = trip.data.items.$values;
+  // trip.data.items.$values.every((element, index) => {
+  //   //+
+  //   console.log(element);
+  //   trips.innerHTML += `<div class="bg-gray-100 p-4 rounded-lg shadow">
+  //   <h3 class="text-lg font-semibold">${element.startingLocation} to ${element.destination}</h3>
+  //   <p class="text-gray-600">Time: ${element.departureTime}</p>
+  //   <p class="text-gray-600">Date: ${element.departureDate}</p>
+  //   <p class="text-gray-800 font-bold">₦${element.amount}</p>
+  //   <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Book Now</button>
+  //   </div>`;
+  //   if (index == 3) return false;
+  // });
+  for (let i = 0; i < trip.data.items.$values.length; i++) {
     console.log(element);
     trips.innerHTML += `<div class="bg-gray-100 p-4 rounded-lg shadow">
-    <h3 class="text-lg font-semibold">${element.startingLocation} to ${element.destination}</h3>
-    <p class="text-gray-600">Time: ${element.departureTime}</p>
-    <p class="text-gray-600">Date: ${element.departureDate}</p>
-    <p class="text-gray-800 font-bold">₦${element.amount}</p>
+    <h3 class="text-lg font-semibold">${element[i].startingLocation} to ${element[i].destination}</h3>
+    <p class="text-gray-600">Time: ${element[i].departureTime}</p>
+    <p class="text-gray-600">Date: ${element[i].departureDate}</p>
+    <p class="text-gray-800 font-bold">₦${element[i].amount}</p>
     <button class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Book Now</button>
     </div>`;
-    if (index == 2) return false;
-  });
+    if (i == 3) break;
+  }
 };
 displayTrips();
 let viewTrip = () => {
@@ -157,3 +170,10 @@ depositButton.addEventListener("click", async function () {
     alert("An error occurred.");
   }
 });
+// export let logout = () => {
+//   document.querySelector("#Logout").addEventListener("click", () => {
+//     localStorage.removeItem("userToken");
+//     window.location.href = "/Auth/Auth.html";
+//   });
+// };
+// logout();

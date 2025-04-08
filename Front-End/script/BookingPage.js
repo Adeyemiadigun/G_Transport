@@ -1,6 +1,7 @@
 // import { getEvent } from "../script/customerDashBoard.js";
 // getEvent();
-
+import { logout } from "./logout.js";
+logout();
 document.addEventListener("DOMContentLoaded", () => {
   let paymentData = localStorage.getItem("paymentData");
 
@@ -9,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     generateTicket(paymentData);
 
-    localStorage.removeItem("paymentData");
+    // localStorage.removeItem("paymentData");
   }
   else{
     paymentData = JSON.parse(paymentData);
@@ -107,6 +108,8 @@ let bookTrip = async (
 
   let result = await response.json();
   if (result.status) {
+    console.log(result)
+    console.log(result.data.id)
     alert("Booking successful! Proceeding to payment...");
     markTripAsBooked(tripId, button);
     let token = localStorage.getItem("userToken");
@@ -115,7 +118,7 @@ let bookTrip = async (
       user[
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
       ];
-    await payWithPaystack(email,amount,result.id)
+    await payWithPaystack(email,amount,result.data.id)
   } else {
     alert("Booking failed: " + result.message);
   }
@@ -129,7 +132,7 @@ async function payWithPaystack(email, amount, id) {
       body: JSON.stringify({
         email: email,
         amount: amount * 100,
-        callbackUrl: "http://localhost:5500/Customer/callback.html",
+        callbackUrl: "http://127.0.0.1:5500/Customer/callback.html",
         bookingId: id,
       }),
     }
@@ -142,17 +145,18 @@ async function payWithPaystack(email, amount, id) {
     alert("Payment failed: " + data.message);
   }
 }
-let generateTicket = (bookingData, paymentData) => {
+let generateTicket = (bookingData) => {
+  console.log(bookingData)
   let ticketHTML = `
         <div class="ticket bg-white p-4 rounded-lg shadow-md text-center">
             <h2 class="text-xl font-bold">🎟 Trip Ticket</h2>
             <p><strong>Trip:</strong> ${bookingData.startingLocation} to ${bookingData.destination}</p>
-            <p><strong>Date:</strong> ${paymentData.trip.departureTime}</p>
+            <p><strong>Date:</strong> ${bookingData.trip.departureTime}</p>
             <p><strong>Seat No:</strong> ${bookingData.seatNo}</p>
-            <p><strong>Ticket No:</strong> ${paymentData.ticketNumber}</p>
-            <p><strong>Amount Paid:</strong> ₦${paymentData.amount}</p>
-            <p><strong>Transaction ID:</strong> ${paymentData.transaction}</p>
-            <button onclick="downloadTicket('${ticketNumber}', '${bookingData.startingLocation}', '${bookingData.destination}', '${paymentData.amount}', '${paymentData.transaction}')" class="mt-3 bg-green-500 text-white px-4 py-2 rounded">Download Ticket</button>
+            <p><strong>Ticket No:</strong> ${bookingData.ticketNumber}</p>
+            <p><strong>Amount Paid:</strong> ₦${bookingData.amount}</p>
+            <p><strong>Transaction ID:</strong> ${bookingData.transaction}</p>
+            <button onclick="downloadTicket('${bookingData.ticketNumber}', '${bookingData.trip.startingLocation}', '${bookingData.trip.destination}', '${bookingData.amount}', '${bookingData.transaction}')" class="mt-3 bg-green-500 text-white px-4 py-2 rounded">Download Ticket</button>
         </div>
     `;
 

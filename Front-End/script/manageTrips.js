@@ -1,3 +1,5 @@
+import { logout } from "./logout.js";
+logout();
 const fetchMembers = async () => {
   try {
     const response = await fetch(
@@ -19,28 +21,53 @@ const fetchMembers = async () => {
     return { data: { $values: [] } }; // Return empty data structure to prevent crashes
   }
 };
-const displayMember = async () => {
-  const drivers = await fetchMembers();
-  const driverList = document.querySelector("#driverList");
+// const displayMember = async () => {
+//   const drivers = await fetchMembers();
+//   const driverList = document.querySelector("#driverList");
 
-  // Clear previous checkboxes
+//   // Clear previous checkboxes
+//   if (drivers.data.$values.length === 0) {
+//     driverList.innerHTML = "No available drivers.";
+//     return;
+//   }
+
+//   driverList.innerHTML = ""; // Reset container
+
+//   drivers.data.$values.forEach((driver) => {
+//     driverList.innerHTML += `
+//             <div class="flex items-center space-x-2 mb-1">
+//                 <input type="checkbox" value="${driver.id}" name="driverIds" class="driverCheckbox" onchange="limitDriverSelection()">
+//                 <label>${driver.firstName} ${driver.lastName}</label>
+//             </div>
+//         `;
+//   });
+// };
+const displayMember = async (selectedDriverIds = [],e) => {
+  const drivers = await fetchMembers();
+  const driverList = document.querySelector(e);
+
+  driverList.innerHTML = ""; // Reset container
+
   if (drivers.data.$values.length === 0) {
     driverList.innerHTML = "No available drivers.";
     return;
   }
 
-  driverList.innerHTML = ""; // Reset container
-
   drivers.data.$values.forEach((driver) => {
+    const isChecked = selectedDriverIds.includes(driver.id);
     driverList.innerHTML += `
-            <div class="flex items-center space-x-2 mb-1">
-                <input type="checkbox" value="${driver.id}" name="driverIds" class="driverCheckbox" onchange="limitDriverSelection()">
-                <label>${driver.firstName} ${driver.lastName}</label>
-            </div>
-        `;
+      <div class="flex items-center space-x-2 mb-1">
+        <input type="checkbox" value="${
+          driver.id
+        }" name="driverIds" class="driverCheckbox" onchange="limitDriverSelection()" ${
+      isChecked ? "checked" : ""
+    }>
+        <label>${driver.firstName} ${driver.lastName}</label>
+      </div>
+    `;
   });
 };
-displayMember();
+displayMember([],"#driverList");
 
 let limitDriverSelection = () => {
   const selected = document.querySelectorAll(".driverCheckbox:checked");
@@ -80,7 +107,6 @@ async function loadVehicles() {
   }
 }
 loadVehicles();
-
 async function loadTrips() {
   try {
     const response = await fetch(
@@ -114,13 +140,10 @@ async function loadTrips() {
 
     trips.data.items.$values.forEach((trip) => {
       let driverNames = "";
-      if (trip.drivers && trip.drivers.$values.length > 0) {
-        trip.drivers.$values.forEach((driver) => {
-          driverNames += `<p>${driver.firstName} ${driver.lastName}</p>`;
-        });
-      } else {
-        driverNames = "N/A";
-      }
+
+      trip.drivers.$values.forEach((driver) => {
+        driverNames += `<p>${driver.firstName} ${driver.lastName}</p>`;
+      });
 
       const row = `
         <tr class="border-b" id="row-${trip.id}">
@@ -129,28 +152,85 @@ async function loadTrips() {
           <td class="p-2">${trip.destination}</td>
           <td class="p-2">${trip.departureTime}</td>
           <td class="p-2">${trip.departureDate}</td>
-          <td class="p-2">${trip.vehicle?.name || "N/A"}</td>
+          <td class="p-2">${trip.vehicleName || "N/A"}</td>
           <td class="p-2">${driverNames}</td>
           <td class="p-2">₦${trip.amount}</td>
           <td class="p-2">
-            <button class="text-blue-500 mr-2">Edit</button>
+            <button class="text-blue-500 mr-2" data-trip-id="${
+              trip.id
+            }">Edit</button>
             <button class="text-red-500" onclick="deleteTrip('${
               trip.id
             }')">Delete</button>
           </td>
         </tr>
       `;
-
       tripList.innerHTML += row;
+    });
+
+    // Event delegation: Attach a single event listener to the parent element
+    tripList.addEventListener("click", (event) => {
+      if (event.target && event.target.matches("button.text-blue-500")) {
+        const tripId = event.target.getAttribute("data-trip-id");
+        const trip = trips.data.items.$values.find((t) => t.id === tripId); // Find the corresponding trip object
+        if (trip) {
+          console.log("clicked", trip);
+          editTrip(trip); // Call editTrip with the correct trip object
+        }
+      }
     });
   } catch (error) {
     console.error("Error loading trips:", error);
   }
 }
 
+const editTrip = (trip) => {
+  console.log("Trip object:", trip);
+  document.getElementById("editModal").classList.remove("hidden");
+
+  document.getElementById("tripId").value = trip.id; 
+  document.querySelector("#estartingLocation").value =
+    trip.startingLocation; 
+  document.querySelector("#edestination").value = trip.destination ;
+  document.querySelector("#edepartureDate").value =
+    trip.departureDate?.split("T")[0]; 
+  document.querySelector("#edepartureTime").value = trip.departureTime; 
+  document.querySelector("#eamount").value = trip.amount;
+
+  const vehicleSelect = document.querySelector("#vehicleId");
+  vehicleSelect.value = trip.vehicleId; 
+
+  const selectedDriverIds = trip.drivers?.$values.map((d) => d.id);
+  displayMember(selectedDriverIds, "#edriverList"); 
+  load();
+};
 loadTrips();
+async function load() {
+  try {
+    const response = await fetch(
+      "https://localhost:7156/api/Vehicle/get-all?PageSize=10&CurrentPage=1",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("userToken"),
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    let vehicleSelect = document.getElementById("evehicleId");
 
-
+    data.data.items.$values.forEach((vehicle) => {
+      let option = document.createElement("option");
+      option.value = vehicle.id;
+      option.textContent = vehicle.name + " (" + vehicle.plateNo + ")";
+      vehicleSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error("Error fetching vehicles:", error);
+  }
+}
+// load();
 async function deleteTrip(tripId) {
   if (!confirm("Are you sure you want to delete this trip?")) return;
 
@@ -196,7 +276,6 @@ document
       description: document.getElementById("description").value,
       amount: parseFloat(document.getElementById("amount").value),
       vehicleId: document.getElementById("vehicleId").value,
-      status: true,
       driverIds: Array.from(
         document.querySelectorAll(".driverCheckbox:checked")
       ).map((checkbox) => checkbox.value), // Collect selected driver IDs
@@ -234,7 +313,9 @@ document
     }
   });
 
-// Function to limit driver selection to 3
+
+document.querySelector("#openModal").addEventListener("click", openModal);
+document.querySelector("#closeModal").addEventListener("click", closeModal);
 
 function openModal() {
   document.getElementById("tripModal").classList.remove("hidden");
@@ -242,5 +323,60 @@ function openModal() {
 function closeModal() {
   document.getElementById("tripModal").classList.add("hidden");
 }
+
+const getSelectedDriverIds = () => {
+  const checkboxes = document.querySelectorAll(".driverCheckbox:checked");
+  return Array.from(checkboxes).map((cb) => cb.value);
+};
+
+
+document.getElementById("editForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    tripId: document.getElementById("tripId").value,
+    startingLocation: document.getElementById("estartingLocation").value,
+    destination: document.getElementById("edestination").value,
+    departureDate:
+      document.getElementById("edepartureDate").value +
+      "T" +
+      document.getElementById("edepartureTime").value,
+    departureTime: document.getElementById("edepartureTime").value,
+    amount: parseFloat(document.getElementById("eamount").value),
+    vehicleId: document.getElementById("evehicleId").value, // Selected vehicle
+    driverIds: getSelectedDriverIds(),
+  };
+
+  try {
+    const response = await fetch(`https://localhost:7156/api/Trip/update`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("userToken"),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error("Update failed");
+
+    closeMod();
+    loadTrips(); // refresh table
+  } catch (err) {
+    console.error("Failed to update trip:", err);
+  }
+});
+
+
+const closeMod = () => {
+  document.getElementById("editModal").classList.add("hidden");
+};
+
+
+document.querySelector("#closeMod").addEventListener("click", closeMod);
+
+
+
+
+
 
 

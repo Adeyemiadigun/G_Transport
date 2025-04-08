@@ -57,7 +57,6 @@ namespace G_Transport.Services.Implementations
                     Status = Status.Failed,
                     TripId = trip.Id,
                     Trip = trip,
-
                     CustomerId = customer.Id
                 };
                 await _bookingRepository.CreateAsync(failedBooking);

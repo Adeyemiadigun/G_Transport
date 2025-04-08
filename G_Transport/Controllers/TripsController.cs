@@ -3,6 +3,8 @@ using G_Transport.Services.Interfaces;
 using G_Transport.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using G_Transport.Services.Implementations;
+using System.Threading.Tasks;
+using G_Transport.Models.Enums;
 
 namespace G_Transport.Controllers
 {
@@ -13,7 +15,7 @@ namespace G_Transport.Controllers
         private readonly ITripService _tripService;
         private readonly ICurrentUser _currentUser;
 
-        public TripController(ITripService tripService,ICurrentUser currentUser)
+        public TripController(ITripService tripService, ICurrentUser currentUser)
         {
             _tripService = tripService;
             _currentUser = currentUser;
@@ -36,7 +38,7 @@ namespace G_Transport.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTrip(Guid id)
         {
@@ -115,16 +117,16 @@ namespace G_Transport.Controllers
             return Ok(response);
         }
         [HttpGet("TripCount")]
-        public  IActionResult SuccessfullTripCount()
+        public IActionResult SuccessfullTripCount()
         {
-            var response =  _tripService.TripCount(x => x.Status == true);
+            var response = _tripService.TripCount(x => x.Status == Status.Successful);
 
             return Ok(new { SuccessfullTripCount = response });
         }
         [HttpGet("FailedTripCount")]
-        public  IActionResult FailedtripCount()
+        public IActionResult FailedtripCount()
         {
-            var response =  _tripService.TripCount(x => x.Status == false);
+            var response = _tripService.TripCount(x => x.Status == Status.Failed);
 
             return Ok(new { FailedTripCount = response });
         }
@@ -132,10 +134,10 @@ namespace G_Transport.Controllers
         public IActionResult CustomerTripCount()
         {
             var currentUser = _currentUser.GetCurrentuserId();
-            var response = _tripService.TripCount(x => x.Bookings.Any(c => c.CustomerId == currentUser)&& x.Status);
+            var response = _tripService.TripCount(x => x.Bookings.Any(c => c.CustomerId == currentUser) && x.Status == Status.Successful);
             return Ok(new { CustomerTrip = response });
 
-        } 
+        }
         [HttpGet("Customer-Trips-pending-review")]
         public IActionResult CustomerPendingReviewCount()
         {
@@ -143,6 +145,27 @@ namespace G_Transport.Controllers
             var response = _tripService.TripCount(x => !x.Reviews.Any(r => r.CustomerId == currentUser));
             return Ok(new { PendingReview = response });
 
+        }
+        [HttpGet("Customer-Trips")]
+        public async Task<IActionResult> CustomerTrips([FromQuery] PaginationRequest request)
+        {
+            var response = await _tripService.GetAllCustomerTrip(request);
+            if (response.Status)
+            {
+                return Ok(response);
+            }
+            return NoContent();
+        }
+        [Authorize]
+        [HttpPatch("Status")]
+        public async Task<IActionResult> Triggerstatus([FromQuery] TriggerTripStatus model)
+        {
+            var response = await _tripService.TriggerTripStatus(model);
+            if (!response.Status)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
         }
     }
 }

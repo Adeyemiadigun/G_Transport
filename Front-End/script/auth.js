@@ -59,6 +59,7 @@
       console.log(token)
       if (token) {
         const user = jwt_decode(token);
+        console.log("Decoded JWT:", user);
         let userRole = user["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]
         console.log(userRole)
         if (userRole === "Admin") {
@@ -85,11 +86,9 @@
 )
     .then(async (res) => await res.json())
     .then((response) => {
-      console.log(response.token)
       localStorage.removeItem("userToken");
       localStorage.setItem("userToken",response.token);
       // localStorage.setItem("response", JSON.stringify(response.token));
-      console.log(response.token);
     })
     .catch((error) => {
       alert("Error: " + error);

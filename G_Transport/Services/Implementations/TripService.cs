@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using G_Transport.Dtos;
 using G_Transport.Models.Domain;
+using G_Transport.Models.Enums;
 using G_Transport.Repositories.Implementations;
 using G_Transport.Repositories.Interfaces;
 using G_Transport.Services.Interfaces;
@@ -15,13 +16,14 @@ namespace G_Transport.Services.Implementations
         private readonly ICurrentUser _currentUser;
         private readonly ICustomerRepository _customerRepository;
         private readonly IDriverRepository _driverRepository;
-        public TripService(ITripRepository tripRepository, IVehicleRepository vehicleRepository, IUnitOfWork unitOfWork,ICustomerRepository customerRepository, IDriverRepository driverRepository)
+        public TripService(ITripRepository tripRepository, IVehicleRepository vehicleRepository, IUnitOfWork unitOfWork, ICustomerRepository customerRepository, IDriverRepository driverRepository,ICurrentUser currentUser)
         {
             _tripRepository = tripRepository;
             _vehicleRepository = vehicleRepository;
             _unitOfWork = unitOfWork;
             _customerRepository = customerRepository;
             _driverRepository = driverRepository;
+            _currentUser = currentUser;
         }
         public async Task<BaseResponse<TripDto>> CreateAsync(CreateTripRequestModel model)
         {
@@ -44,16 +46,26 @@ namespace G_Transport.Services.Implementations
                 Description = model.Description,
                 Amount = model.Amount,
                 VehicleId = model.VehicleId,
-                Vehicle = vehicle
+                Vehicle = vehicle,
+                Status = Status.Pending
             };
 
-         
+
             var drivers = await _driverRepository.GetByIdsAsync(model.DriverIds);
             if (drivers.Count != model.DriverIds.Count)
             {
                 return new BaseResponse<TripDto>
                 {
                     Message = "One or more drivers not found",
+                    Status = false
+                };
+            }
+            var res = await _tripRepository.CheckAsync(x => x.Drivers.Any(c => drivers.Contains(c.Driver) && c.Trip.DepartureDate.Date == model.DepartureDate.Date));
+            if (res)
+            {
+                return new BaseResponse<TripDto>
+                {
+                    Message = "One or More Driver has been assigned to a trip for the day",
                     Status = false
                 };
             }
@@ -68,7 +80,7 @@ namespace G_Transport.Services.Implementations
 
             trip.Drivers = tripDrivers;
             await _tripRepository.CreateAsync(trip);
-            await _unitOfWork.SaveChangesAsync(); 
+            await _unitOfWork.SaveChangesAsync();
 
             return new BaseResponse<TripDto>
             {
@@ -81,7 +93,6 @@ namespace G_Transport.Services.Implementations
                     Destination = trip.Destination,
                     DepartureTime = trip.DepartureTime ?? default,
                     DepartureDate = trip.DepartureDate,
-                    DriverNo = trip.Drivers.Count,
                     Drivers = drivers.Select(d => new DriverDto
                     {
                         Id = d.Id,
@@ -89,7 +100,7 @@ namespace G_Transport.Services.Implementations
                         LastName = d.Profile.LastName
                     }).ToList(),
                     VehicleId = trip.VehicleId,
-                    Vehicle = trip.Vehicle,
+                    VehicleName = trip.Vehicle.Name,
                     Description = trip.Description,
                     Amount = trip.Amount,
                     Status = trip.Status
@@ -109,8 +120,8 @@ namespace G_Transport.Services.Implementations
             }
 
             trip.IsDeleted = true;
-            _tripRepository.Update(trip); 
-            await _unitOfWork.SaveChangesAsync(); 
+            _tripRepository.Update(trip);
+            await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
@@ -144,7 +155,7 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)x.DepartureTime,
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
-                    Vehicle = x.Vehicle,
+                    VehicleName = x.Vehicle.Name,
                     Drivers = x.Drivers.Select(c => new DriverDto
                     {
                         Id = c.Driver.Id,
@@ -197,7 +208,7 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)x.DepartureTime,
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
-                    Vehicle = x.Vehicle,
+                    VehicleName = x.Vehicle.Name,
                     Drivers = x.Drivers.Select(c => new DriverDto
                     {
                         Id = c.Driver.Id,
@@ -212,7 +223,7 @@ namespace G_Transport.Services.Implementations
             };
 
             return new BaseResponse<PaginationDto<TripDto>>
-            { 
+            {
                 Status = true,
                 Message = "Upcoming trips retrieved successfully",
                 Data = result
@@ -248,7 +259,7 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)x.DepartureTime,
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
-                    Vehicle = x.Vehicle,
+                    VehicleName = x.Vehicle.Name,
                     Drivers = x.Drivers.Select(c => new DriverDto
                     {
                         Id = c.Driver.Id,
@@ -273,7 +284,7 @@ namespace G_Transport.Services.Implementations
         {
             var user = _currentUser.GetCurrentUser();
             var customer = await _customerRepository.GetAsync(x => x.Email == user);
-            var trips = await _tripRepository.GetAllAsync(x => !x.Reviews.Any(r => r.CustomerId == customer.Id), request);
+            var trips = await _tripRepository.GetAllAsync(x => !x.Reviews.Any(r => r.CustomerId == customer.Id) && x.Status == Status.Successful, request);
             if (trips.Items.Count() == 0 || trips == null)
             {
                 return new BaseResponse<PaginationDto<TripDto>>
@@ -299,7 +310,7 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)x.DepartureTime,
                     DepartureDate = x.DepartureDate,
                     VehicleId = x.VehicleId,
-                    Vehicle = x.Vehicle,
+                    VehicleName = x.Vehicle.Name,
                     Drivers = x.Drivers.Select(c => new DriverDto
                     {
                         Id = c.Driver.Id,
@@ -322,7 +333,7 @@ namespace G_Transport.Services.Implementations
 
         public async Task<BaseResponse<TripDto>> GetAsync(Expression<Func<Trip, bool>> exp)
         {
-           var trip = await _tripRepository.GetAsync(exp);
+            var trip = await _tripRepository.GetAsync(exp);
             if (trip == null)
             {
                 return new BaseResponse<TripDto>
@@ -344,7 +355,14 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)trip.DepartureTime,
                     DepartureDate = trip.DepartureDate,
                     VehicleId = trip.VehicleId,
-                    Vehicle = trip.Vehicle,
+                    VehicleName = trip.Vehicle.Name,
+                    Drivers = trip.Drivers.Select(c => new DriverDto
+                    {
+                        Id = c.Driver.Id,
+                        FirstName = c.Driver.Profile.FirstName,
+                        LastName = c.Driver.Profile.LastName,
+                        DriverNo = c.Driver.DriverNo
+                    }).ToList(),
                     Description = trip.Description,
                     Amount = trip.Amount,
                     Status = trip.Status,
@@ -386,6 +404,7 @@ namespace G_Transport.Services.Implementations
                 Id = trip.Id,
                 DepartureTime = trip.DepartureTime ?? TimeSpan.Zero,
                 DepartureDate = trip.DepartureDate,
+                StartingLocation= trip.StartingLocation,
                 Destination = trip.Destination,
                 VehicleId = trip.VehicleId,
                 Amount = trip.Amount,
@@ -418,10 +437,39 @@ namespace G_Transport.Services.Implementations
             trip.Destination = model.Destination;
             trip.Amount = model.Amount;
             trip.Description = model.Description;
-            trip.Status = model.Status;
-             _tripRepository.Update(trip);
+            trip.VehicleId = model.VehicleId;
+            var drivers = await _driverRepository.GetByIdsAsync(model.DriverIds);
+            if (drivers.Count != model.DriverIds.Count)
+            {
+                return new BaseResponse<TripDto>
+                {
+                    Message = "One or more drivers not found",
+                    Status = false
+                };
+            }
+            var res = await _tripRepository.CheckAsync(x => x.Drivers.Any(c => drivers.Contains(c.Driver) && c.Trip.DepartureDate.Date == model.DepartureDate.Date));
+            if (res)
+            {
+                return new BaseResponse<TripDto>
+                {
+                    Message = "One or More Driver has been assigned to a trip for the day",
+                    Status = false
+                };
+            }
+
+            var tripDrivers = drivers.Select(driver => new TripDriver
+            {
+                TripId = trip.Id,
+                Trip = trip,
+                DriverId = driver.Id,
+                Driver = driver
+            }).ToList();
+
+            trip.Drivers = tripDrivers;
+            _tripRepository.Update(trip);
             await _unitOfWork.SaveChangesAsync();
-            return new BaseResponse<TripDto> {
+            return new BaseResponse<TripDto>
+            {
                 Status = true,
                 Message = "Trip updated successfully",
                 Data = new TripDto
@@ -432,7 +480,7 @@ namespace G_Transport.Services.Implementations
                     DepartureTime = (TimeSpan)trip.DepartureTime,
                     DepartureDate = trip.DepartureDate,
                     VehicleId = trip.VehicleId,
-                    Vehicle = trip.Vehicle,
+                    VehicleName = trip.Vehicle.Name,
                     Drivers = trip.Drivers.Select(c => new DriverDto
                     {
                         Id = c.Driver.Id,
@@ -448,9 +496,89 @@ namespace G_Transport.Services.Implementations
         }
         public int TripCount(Expression<Func<Trip, bool>> exp)
         {
-            return  _tripRepository.GetAll(exp);
+            return _tripRepository.GetAll(exp);
         }
-       
+
+        public async Task<BaseResponse<PaginationDto<TripDto>>> GetAllCustomerTrip(PaginationRequest request)
+        {
+            try
+            {
+                string? currentUser = _currentUser.GetCurrentUser();
+                if (currentUser == null)
+                    throw new Exception("User is not logged in");
+                var customer = await _customerRepository.GetAsync(x => x.Email == currentUser);
+                var trips = await _tripRepository.GetAllAsync(x => x.Bookings.Any(x => x.CustomerId == customer.Id), request);
+                if(trips.Items.Count() == 0 )
+                {
+                    return new BaseResponse<PaginationDto<TripDto>>
+                    {
+                        Message = "No content",
+                        Status = false
+                    };
+                }
+                var result = new PaginationDto<TripDto>
+                {
+                    TotalItems = trips.TotalItems,
+                    TotalPages = trips.TotalPages,
+                    CurrentPage = trips.CurrentPage,
+                    HasNextPage = trips.HasNextPage,
+                    HasPreviousPage = trips.HasPreviousPage,
+                    PageSize = trips.PageSize,
+                    Items = trips.Items.Select(x => new TripDto
+                    {
+                        Id = x.Id,
+                        StartingLocation = x.StartingLocation,
+                        Destination = x.Destination,
+                        DepartureTime = (TimeSpan)x.DepartureTime,
+                        DepartureDate = x.DepartureDate,
+                        VehicleId = x.VehicleId,
+                        VehicleName = x.Vehicle.Name,
+                        Drivers = x.Drivers.Select(c => new DriverDto
+                        {
+                            Id = c.Driver.Id,
+                            FirstName = c.Driver.Profile.FirstName,
+                            LastName = c.Driver.Profile.LastName,
+                            DriverNo = c.Driver.DriverNo
+                        }).ToList(),
+                        Description = x.Description,
+                        Amount = x.Amount,
+                        Status = x.Status
+                    }).ToList()
+                };
+                return new BaseResponse<PaginationDto<TripDto>>
+                {
+                    Status = true,
+                    Message = "Trips retrieved successfully",
+                    Data = result
+                };
+
+            }
+            catch (Exception ex)
+            {
+                {
+                    throw new ArgumentNullException("Customer not in the system");
+                }
+            }
+        }
+
+        public async Task<BaseResponse<bool>> TriggerTripStatus(TriggerTripStatus model)
+        {
+            var trip = await _tripRepository.GetAsync(model.Id);
+            if (trip == null)
+                return new BaseResponse<bool>
+                {
+                    Status = false,
+                    Message ="Trip does not ezist"
+                };
+            trip.Status = model.Status;
+            _tripRepository.Update(trip);
+            await _unitOfWork.SaveChangesAsync();
+            return new BaseResponse<bool>
+            {
+                Status = true,
+                Message = "Trip triggered successfully"
+            };
+        }
     }
 }
 

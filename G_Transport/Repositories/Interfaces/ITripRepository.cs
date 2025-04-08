@@ -11,5 +11,6 @@ namespace G_Transport.Repositories.Interfaces
         Task<PaginationDto<Trip>> GetAllAsync(PaginationRequest request);
         Task<PaginationDto<Trip>?> GetAllAsync(Expression<Func<Trip,bool> >exp, PaginationRequest request   );
         int GetAll(Expression<Func<Trip, bool>> exp);
+        
     }
 }

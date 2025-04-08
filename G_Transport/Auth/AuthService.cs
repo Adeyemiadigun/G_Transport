@@ -38,6 +38,7 @@ namespace G_Transport.Auth
                 signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
     }
 }
