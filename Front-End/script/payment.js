@@ -35,15 +35,22 @@ async function fetchPayments() {
                         <td class='border p-2'>${new Date(
                           payment.dateCreated
                         ).toLocaleDateString()}</td>
-                        <td class='border p-2'><button class='bg-blue-500 text-white px-3 py-1 rounded'  id ="downloadBtn">Download</button></td>
+                        <td class='border p-2'><button class='bg-blue-500 text-white px-3 py-1 rounded'  id ="${payment.id}-downloadBtn">Download</button></td>
                     </tr>`;
       tableBody.innerHTML += row;
       console.log(payment)
-      document.querySelector("#downloadBtn").addEventListener("click", ()=>
-      {
-        console.log(payment.dateCreated)
-          downloadReceipt(payment.refrenceNo, payment.transaction,payment.amount,payment.status,payment.dateCreated);
-      })
+      document
+        .querySelector(`#${payment.id}-downloadBtn`)
+        .addEventListener("click", () => {
+          console.log(payment.dateCreated);
+          downloadReceipt(
+            payment.refrenceNo,
+            payment.transaction,
+            payment.amount,
+            payment.status,
+            payment.dateCreated
+          );
+        });
     });
   } else {
     document.getElementById(
@@ -84,7 +91,7 @@ function downloadReceipt(
   doc.text(`Date : ${dateCreated}`, 20, 90);
 
   // Save the PDF file
-  doc.save(`Ticket_receipt.pdf`);
+  doc.save(`Ticket_receipt-${referenceNo}.pdf`);
 }
 
 fetchPayments();

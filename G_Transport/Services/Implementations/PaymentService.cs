@@ -21,8 +21,9 @@ namespace G_Transport.Services.Implementations
         private readonly ICustomerRepository _customerRepository;
         private readonly HttpClient _httpClient;
         private readonly string _paystackSecretKey;
+        private readonly ITicketService _ticketService;
 
-        public PaymentService(IBookingRepository bookingRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork, ICustomerRepository customerRepository, ICurrentUser currentUser, IConfiguration configuration)
+        public PaymentService(IBookingRepository bookingRepository, IPaymentRepository paymentRepository, IUnitOfWork unitOfWork, ICustomerRepository customerRepository, ICurrentUser currentUser, IConfiguration configuration, ITicketService ticketService)
         {
             _bookingRepository = bookingRepository;
             _paymentRepository = paymentRepository;
@@ -32,6 +33,7 @@ namespace G_Transport.Services.Implementations
             _httpClient = new HttpClient();
             _paystackSecretKey = configuration["Paystack:SecretKey"];
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",_paystackSecretKey);
+            _ticketService = ticketService;
         }
         public Task<BaseResponse<PaymentDto>> GetPaymentAsync()
         {
@@ -252,6 +254,7 @@ namespace G_Transport.Services.Implementations
 
                 await _unitOfWork.SaveChangesAsync();
 
+                var successfulBookingsCount = booking.Trip.Bookings.Count(b => b.Status == Status.Successful);
                 // Return PaymentDto with Ticket
                 var paymentDto = new PaymentDto
                 {
@@ -262,10 +265,12 @@ namespace G_Transport.Services.Implementations
                     Status = payment.Status,
                     CustomerId = booking.CustomerId,
                     DateCreated = payment.DateCreated,
+                    SeatNo = successfulBookingsCount +1,
                     TripId = booking.TripId,
                     Trip = new TripDto
                     {
                         DepartureTime = (TimeSpan)booking.Trip.DepartureTime,
+                        StartingLocation = booking.Trip.StartingLocation,
                         Destination = booking.Trip.Destination,
                         VehicleId = booking.Trip.VehicleId,
                         Amount = booking.Trip.Amount,
@@ -273,6 +278,20 @@ namespace G_Transport.Services.Implementations
                         Status = booking.Trip.Status
                     }
                 };
+                var ticket = new Ticket
+                {
+                    TripOrigin = booking.Trip.StartingLocation,
+                    TripDestination = booking.Trip.Destination,
+                    TripDate = booking.Trip.DepartureDate,
+                    TicketNumber = $"{payment.RefrenceNo.Substring(0, 8)}-{booking.Id.ToString().Substring(0, 8)}",
+                    SeatNumber = paymentDto.SeatNo,
+                    AmountPaid = payment.Amount,
+                    CustomerId = booking.CustomerId,
+                    RefrenceNo = payment.RefrenceNo,
+                    TripId = booking.TripId
+                };
+                await _ticketService.CreateTicketAsync(ticket);
+                await _unitOfWork.SaveChangesAsync();
 
                 return new BaseResponse<PaymentDto>
                 {

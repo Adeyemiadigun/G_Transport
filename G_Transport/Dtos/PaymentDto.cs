@@ -15,6 +15,7 @@ namespace G_Transport.Dtos
         public TripDto Trip { get; set; }
         public Status Status { get; set; }
         public DateTime DateCreated { get; set; }
+        public int SeatNo { get; set; }
     }
     public class PaymentRequestModel
     {

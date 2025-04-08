@@ -18,6 +18,7 @@ namespace G_Transport.Context
         public DbSet<Vehicle> Vehicles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<TripDriver> TripDrivers { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
